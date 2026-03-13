@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTheme } from './themeContext'
 
@@ -10,83 +11,121 @@ const navItems = [
 ]
 
 function SiteLayout() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [headerVisible, setHeaderVisible] = useState(true)
   const { theme, toggleTheme } = useTheme()
+  const lastScrollY = useRef(0)
+
+  useEffect(() => {
+    function handleScroll() {
+      const currentScrollY = window.scrollY
+      const previousScrollY = lastScrollY.current
+
+      if (currentScrollY <= 12) {
+        setHeaderVisible(true)
+      } else if (currentScrollY > previousScrollY + 6) {
+        setHeaderVisible(false)
+        setMenuOpen(false)
+      } else if (currentScrollY < previousScrollY - 6) {
+        setHeaderVisible(true)
+      }
+
+      lastScrollY.current = currentScrollY
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  function handleLinkClick() {
+    setMenuOpen(false)
+  }
 
   return (
-    <div className="min-h-screen px-4 py-4 sm:px-6 lg:px-10">
-      <div className="site-shell mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[1600px] flex-col gap-6 p-4 xl:p-6">
-        <header className="site-header px-5 py-5 sm:px-6">
-          <div className="site-header-top">
-            <div className="flex items-center gap-4">
-              <div className="site-brand-mark">
-                C
-              </div>
-              <div>
-                <p className="eyebrow">Continuumm Command Network</p>
-                <p className="mt-1 text-sm text-slate-300">
-                  Geopolitical spillover simulator
-                </p>
-              </div>
-            </div>
-            <div className="status-rail">
-              <span className="signal-pill">
-                <span className="signal-dot" />
-                Structural model live
+    <div className="min-h-screen">
+      <header
+        className={`top-nav ${headerVisible ? 'top-nav-visible' : 'top-nav-hidden'}`}
+      >
+        <div className="top-nav-inner">
+          <NavLink to="/" className="brand-cluster" onClick={handleLinkClick}>
+            <span className="site-brand-mark">
+              <img
+                src="/logo.svg"
+                alt="Continuumm logo"
+                className="site-brand-logo"
+              />
+            </span>
+            <span className="brand-word">Continuumm</span>
+          </NavLink>
+
+          <div className="top-nav-right">
+            <NavLink
+              to="/simulator"
+              className="header-cta"
+              onClick={handleLinkClick}
+            >
+              Simulation
+            </NavLink>
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+              title="Toggle theme"
+            >
+              <span className="theme-toggle-value">
+                {theme === 'dark' ? 'Dark' : 'Light'}
               </span>
-              <span className="signal-pill">Prototype phase</span>
-              <span className="signal-pill">Dark default theater</span>
-            </div>
+            </button>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Menu"
+              title="Menu"
+              onClick={() => setMenuOpen((current) => !current)}
+            >
+              <svg viewBox="0 0 24 24" className="icon-svg" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
           </div>
+        </div>
 
-          <div className="site-header-bottom">
-            <nav className="flex flex-wrap gap-2">
-              {navItems.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.to === '/'}
-                  className={({ isActive }) =>
-                    `nav-link ${isActive ? 'nav-link-active' : ''}`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
-            <div className="flex flex-wrap items-center gap-2 self-start xl:self-auto">
-              <button type="button" className="theme-toggle" onClick={toggleTheme}>
-                <span className="theme-toggle-label">Theme</span>
-                <span className="theme-toggle-value">
-                  {theme === 'dark' ? 'Dark' : 'Light'}
-                </span>
-              </button>
-              <NavLink to="/simulator" className="route-cta">
-                Open Simulator
+        {menuOpen ? (
+          <nav className="nav-drawer" aria-label="Main navigation">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.to === '/'}
+                className={({ isActive }) =>
+                  `drawer-link ${isActive ? 'drawer-link-active' : ''}`
+                }
+                onClick={handleLinkClick}
+              >
+                {item.label}
               </NavLink>
-            </div>
-          </div>
-        </header>
+            ))}
+          </nav>
+        ) : null}
+      </header>
 
-        <main className="flex-1">
+      <div className="site-shell mx-auto w-full max-w-[1680px] px-4 pb-4 pt-6 sm:px-5 sm:pt-7 lg:px-6 lg:pt-8">
+
+        <main className="site-main">
           <Outlet />
         </main>
 
-        <footer className="site-footer px-5 py-6 sm:px-6">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="eyebrow">Build posture</p>
-              <h2 className="mt-3 text-2xl text-stone-100">
-                Operations-first visual system, openly documented.
-              </h2>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
-                Continuumm is being built as a product website first, then expanded
-                into a richer global network simulator. Public-facing progress is
-                tracked on the Documentation page, while local build memory lives
-                in `.continuumm/`.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
+        <footer className="site-footer">
+          <div className="footer-grid">
+            <p className="footer-copy">
+              Continuumm maps structural spillover across trade, energy, and
+              strategic chokepoints.
+            </p>
+            <div className="footer-nav">
               {navItems.map((item) => (
                 <NavLink
                   key={item.to}

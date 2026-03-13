@@ -1,23 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
   <defs>
-    <linearGradient id="sea" x1="0%" x2="100%" y1="0%" y2="100%">
-      <stop offset="0%" stop-color="#122435" />
-      <stop offset="65%" stop-color="#08131f" />
-      <stop offset="100%" stop-color="#3f5d72" />
+    <radialGradient id="orb-core" cx="44%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#2a4860" />
+      <stop offset="64%" stop-color="#203a53" />
+      <stop offset="100%" stop-color="#172b3b" />
+    </radialGradient>
+    <linearGradient id="orb-rim" x1="14%" x2="86%" y1="18%" y2="88%">
+      <stop offset="0%" stop-color="#6f62ff" />
+      <stop offset="34%" stop-color="#df5f9a" />
+      <stop offset="62%" stop-color="#dd8a3f" />
+      <stop offset="100%" stop-color="#2d60ff" />
     </linearGradient>
-    <linearGradient id="signal" x1="0%" x2="100%" y1="0%" y2="0%">
-      <stop offset="0%" stop-color="#d2b48c" />
-      <stop offset="100%" stop-color="#f29c62" />
+    <linearGradient id="orb-sheen" x1="24%" x2="76%" y1="14%" y2="86%">
+      <stop offset="0%" stop-color="#ebb15f" stop-opacity=".5" />
+      <stop offset="52%" stop-color="#d88445" stop-opacity=".18" />
+      <stop offset="100%" stop-color="#1f5aff" stop-opacity=".44" />
     </linearGradient>
+    <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffd677" stop-opacity=".44" />
+      <stop offset="58%" stop-color="#8d72ff" stop-opacity=".2" />
+      <stop offset="100%" stop-color="#2a65ff" stop-opacity="0" />
+    </radialGradient>
+    <filter id="halo-blur" x="-8" y="-8" width="144" height="144" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="5" />
+    </filter>
+    <clipPath id="orb-cut">
+      <circle cx="64" cy="64" r="38" />
+    </clipPath>
   </defs>
-  <rect width="128" height="128" rx="28" fill="url(#sea)" />
-  <path
-    d="M94 28c-8-5-18-8-30-8-28 0-46 18-46 44 0 27 19 44 46 44 12 0 22-3 30-8v-15c-7 6-16 10-27 10-18 0-31-12-31-31s13-31 31-31c11 0 20 4 27 10V28Z"
-    fill="url(#signal)"
-  />
-  <path
-    d="M76 44h18v12H76zM68 58h26v12H68zM76 72h18v12H76z"
-    fill="#d9e4ec"
-    opacity=".92"
-  />
+
+  <g filter="url(#halo-blur)">
+    <circle cx="64" cy="64" r="44" fill="url(#halo)" />
+  </g>
+
+  <circle cx="64" cy="64" r="38" fill="url(#orb-core)" />
+  <circle cx="64" cy="64" r="38" stroke="url(#orb-rim)" stroke-width="3.2" />
+
+  <g clip-path="url(#orb-cut)" opacity=".9">
+    <path d="M22 92c18-17 40-23 84-24v34H22Z" fill="url(#orb-sheen)" />
+    <path d="M18 69c24-12 52-13 92-10v13c-34-3-64-2-92 6Z" fill="#f2c06a" fill-opacity=".14" />
+    <path d="M30 44c16 10 34 26 46 58h-10c-10-25-23-40-42-54Z" fill="#7f98ff" fill-opacity=".2" />
+  </g>
 </svg>

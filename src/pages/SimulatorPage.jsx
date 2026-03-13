@@ -44,30 +44,39 @@ function SimulatorPage() {
   }
 
   return (
-    <div className="simulator-three-pane">
-      <WarSetupPanel
-        aggressorId={aggressorId}
-        defenderId={defenderId}
-        intensity={intensity}
-        blockedChokepointIds={blockedChokepointIds}
-        onCountryChange={handleWarCountryChange}
-        onIntensityChange={setIntensity}
-      />
+    <div className="space-y-6">
+      <section className="simulator-intro">
+        <p className="landing-kicker">Scenario Workspace</p>
+        <h1 className="simulator-headline">
+          Simulate conflict spillover across global trade and strategic routes.
+        </h1>
+      </section>
 
-      <RippleBoard
-        scenario={scenario}
-        blockedChokepointIds={blockedChokepointIds}
-        selectedCountryId={effectiveSelectedCountryId}
-        onSelectCountry={handleMapCountrySelect}
-        selectedChokepointId={selectedChokepointId}
-        onSelectChokepoint={handleChokepointSelect}
-      />
+      <section className="simulator-three-pane">
+        <WarSetupPanel
+          aggressorId={aggressorId}
+          defenderId={defenderId}
+          intensity={intensity}
+          blockedChokepointIds={blockedChokepointIds}
+          onCountryChange={handleWarCountryChange}
+          onIntensityChange={setIntensity}
+        />
 
-      <CountryImpactPanel
-        scenario={scenario}
-        selectedCountryId={effectiveSelectedCountryId}
-        onCountrySelect={setSelectedCountryId}
-      />
+        <RippleBoard
+          scenario={scenario}
+          blockedChokepointIds={blockedChokepointIds}
+          selectedCountryId={effectiveSelectedCountryId}
+          onSelectCountry={handleMapCountrySelect}
+          selectedChokepointId={selectedChokepointId}
+          onSelectChokepoint={handleChokepointSelect}
+        />
+
+        <CountryImpactPanel
+          scenario={scenario}
+          selectedCountryId={effectiveSelectedCountryId}
+          onCountrySelect={setSelectedCountryId}
+        />
+      </section>
     </div>
   )
 }

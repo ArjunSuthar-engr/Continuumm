@@ -15,9 +15,9 @@
         const preferredTheme =
           storedTheme === 'dark' || storedTheme === 'light'
             ? storedTheme
-            : window.matchMedia('(prefers-color-scheme: light)').matches
-              ? 'light'
-              : 'dark'
+            : window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
 
         document.documentElement.dataset.theme = preferredTheme
         document.documentElement.style.colorScheme = preferredTheme

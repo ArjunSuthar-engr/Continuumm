@@ -5,7 +5,7 @@ const ThemeContext = createContext(null)
 
 function resolveInitialTheme() {
   if (typeof window === 'undefined') {
-    return 'dark'
+    return 'light'
   }
 
   const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
@@ -14,9 +14,9 @@ function resolveInitialTheme() {
     return storedTheme
   }
 
-  return window.matchMedia('(prefers-color-scheme: light)').matches
-    ? 'light'
-    : 'dark'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light'
 }
 
 function useTheme() {
