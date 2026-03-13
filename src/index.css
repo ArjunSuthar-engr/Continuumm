@@ -1246,6 +1246,57 @@
     color: var(--theme-text-strong);
   }
 
+  .impact-meta-row {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .impact-meta-pill {
+    @apply rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.16em];
+    border-color: var(--theme-border);
+    color: var(--theme-text-faint);
+    background: var(--theme-contrast-surface);
+  }
+
+  .horizon-grid {
+    @apply grid gap-2;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .horizon-card {
+    @apply rounded-[8px] border px-3 py-2;
+    border-color: var(--theme-border);
+    background: var(--theme-contrast-surface);
+  }
+
+  .horizon-head {
+    @apply flex items-center justify-between gap-2;
+  }
+
+  .horizon-label {
+    @apply mono text-[10px] uppercase tracking-[0.18em];
+    color: var(--theme-text-faint);
+  }
+
+  .horizon-window {
+    @apply text-[11px];
+    color: var(--theme-text-muted);
+  }
+
+  .horizon-score {
+    @apply mt-2 text-xl leading-none;
+    color: var(--theme-text-strong);
+  }
+
+  .horizon-score span {
+    @apply ml-1 text-sm;
+    color: var(--theme-text-muted);
+  }
+
+  .horizon-summary {
+    @apply mt-2 text-xs leading-5;
+    color: var(--theme-text-base);
+  }
+
   .effect-point-row {
     @apply flex w-full items-center justify-between gap-3 rounded-[8px] border px-3 py-2 text-left transition;
     border-color: var(--theme-border);
@@ -1574,6 +1625,35 @@
     height: 420px;
   }
 
+  .simulator-three-pane {
+    gap: 1rem;
+  }
+
+  .panel {
+    padding: 1rem;
+  }
+
+  .panel-head {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .map-kpi-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .map-line-legend {
+    grid-template-columns: 1fr;
+  }
+
+  .map-layer-toggle-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .horizon-grid {
+    grid-template-columns: 1fr;
+  }
+
   .theater-stage {
     min-height: 410px;
   }
@@ -1630,6 +1710,10 @@
 
   .panel-title {
     @apply text-3xl;
+  }
+
+  .impact-headline {
+    line-height: 1.6;
   }
 
   .theater-stage {

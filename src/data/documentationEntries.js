@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-032',
+    date: '2026-03-14',
+    label: 'UX clarity compression',
+    title: 'Added one-line country summary, horizon cards, and mobile readability pass',
+    summary:
+      'The simulator now presents a compressed country-impact read: a one-line immediate summary, Immediate/Near-term/Lagged horizon cards, tighter copy, and improved mobile legibility for the three-pane workflow.',
+    items: [
+      'Added a concise one-line impact summary generated from real-data route shock and strongest pass-through channel.',
+      'Added horizon cards (0-14 days, 2-8 weeks, 1-6 months) with numeric pressure scores and compact signal lines.',
+      'Reduced verbose country-effect copy and improved mobile panel/map readability with responsive spacing and single-column compression for dense UI areas.',
+    ],
+    review:
+      'On desktop and mobile, select a war pair + country and verify the main impact pathway can be understood from the summary and horizon cards in under 20 seconds.',
+  },
+  {
     id: 'log-031',
     date: '2026-03-14',
     label: 'Interactive map layers',

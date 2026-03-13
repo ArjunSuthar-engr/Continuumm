@@ -20,12 +20,15 @@ function CountryImpactPanel({
   const hasEffectPoints = effectPoints.length > 0
   const primaryEffects = countryEffects?.primaryEffects ?? []
   const secondaryEffects = countryEffects?.secondaryEffects ?? []
+  const horizonCards = countryEffects?.horizonCards ?? []
+  const oneLineSummary = countryEffects?.oneLineSummary
   const immediateOutcome = selectedImpact
     ? `${selectedCountry?.name} is currently under ${selectedImpact.band.toLowerCase()} structural pressure (${selectedImpact.totalScore}/100).`
     : `${selectedCountry?.name} is one of the belligerents, so downstream ranking appears on third-country economies.`
   const outcomeLine = hasEffectPoints
     ? `${countryEffects?.immediateSummary ?? immediateOutcome}`
     : `No chokepoint is currently disruptable by ${scenario.aggressor.name} or ${scenario.defender.name}, so direct route shock on ${selectedCountry?.name} is limited in this scenario.`
+  const headlineLine = hasEffectPoints ? oneLineSummary ?? outcomeLine : outcomeLine
 
   return (
     <aside className="panel">
@@ -35,8 +38,7 @@ function CountryImpactPanel({
           <h2 className="panel-title">Impact on one country</h2>
         </div>
         <p className="panel-copy">
-          Select a country, then inspect map-linked effect points to understand how
-          conflict pressure can propagate into prices and logistics.
+          Select a country to get a compressed impact read in under 20 seconds.
         </p>
       </div>
 
@@ -60,14 +62,35 @@ function CountryImpactPanel({
         </div>
 
         <article className="impact-card">
-          <p className="eyebrow">Immediate outcome</p>
-          <p className="impact-headline">{outcomeLine}</p>
-          <p className="mt-2 text-sm text-slate-300">
-            War pair: {scenario.aggressor.name} vs {scenario.defender.name}
-          </p>
-          <p className="mt-1 text-xs text-slate-500">
-            Secondary model snapshot: {countryEffects?.dataAsOf}
-          </p>
+          <p className="eyebrow">Immediate summary</p>
+          <p className="impact-headline">{headlineLine}</p>
+          <p className="mt-2 text-xs leading-6 text-slate-300">{outcomeLine}</p>
+          <div className="impact-meta-row mt-3">
+            <span className="impact-meta-pill">
+              War pair: {scenario.aggressor.name} vs {scenario.defender.name}
+            </span>
+            <span className="impact-meta-pill">
+              Data snapshot: {countryEffects?.dataAsOf ?? 'n/a'}
+            </span>
+          </div>
+        </article>
+
+        <article className="impact-card">
+          <p className="eyebrow">Horizon read</p>
+          <div className="horizon-grid mt-3">
+            {horizonCards.map((card) => (
+              <div key={card.id} className="horizon-card">
+                <div className="horizon-head">
+                  <p className="horizon-label">{card.label}</p>
+                  <p className="horizon-window">{card.window}</p>
+                </div>
+                <p className="horizon-score">
+                  {card.score}/100 <span>{card.band}</span>
+                </p>
+                <p className="horizon-summary">{card.summary}</p>
+              </div>
+            ))}
+          </div>
         </article>
 
         <article className="impact-card">

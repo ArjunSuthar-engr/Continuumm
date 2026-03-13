@@ -62,12 +62,6 @@ function SimulatorPage() {
   )
     ? selectedChokepointId
     : effectPoints[0]?.id ?? null
-  const selectedCountryName =
-    scenario.countries.find((country) => country.id === effectiveSelectedCountryId)
-      ?.name ?? 'Selected country'
-  const selectedEffectPoint = effectPoints.find(
-    (point) => point.id === effectiveSelectedEffectPointId,
-  )
   const hasControllableRoute = effectPoints.length > 0
   const countryEffects = useMemo(
     () =>
@@ -110,12 +104,11 @@ function SimulatorPage() {
         </h1>
         <p className="mt-4 text-sm leading-7 text-slate-300">
           {hasControllableRoute
-            ? `${selectedCountryName} currently tracks ${effectPoints.length} controllable effect points. Top pressure node: ${selectedEffectPoint?.name ?? 'n/a'}.`
+            ? `${countryEffects.oneLineSummary} Active chokepoints for this pair: ${effectPoints.length}.`
             : `${scenario.aggressor.name} vs ${scenario.defender.name} has no chokepoint in this model where either belligerent can exert enough control to disrupt transit.`}
         </p>
         <p className="mt-2 text-xs text-slate-400">
-          Route-data snapshot: {routeDataSnapshot.asOf} (observed inputs + explicit
-          model assumptions).
+          Route-data snapshot: {routeDataSnapshot.asOf}
         </p>
         <p className="mt-1 text-xs text-slate-500">
           Conflict posture: {scenario.conflictMode.label} | horizon:{' '}

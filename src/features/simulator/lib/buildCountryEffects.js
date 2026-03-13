@@ -78,6 +78,10 @@ function pressurePhrase(score) {
   return 'minimal pressure'
 }
 
+function toSignalLine(label, score, band) {
+  return `${label} ${score}/100 (${band.toLowerCase()})`
+}
+
 function hasEnergyOutcome(outcomeId) {
   return ['crude', 'gasoline', 'lng', 'energy', 'fuel'].includes(outcomeId)
 }
@@ -174,6 +178,7 @@ export function buildCountryEffects({
   selectedEffectPointId,
 }) {
   const selectedCountry = countriesById[selectedCountryId]
+  const selectedCountryName = selectedCountry?.name ?? 'Selected country'
   const selectedPoint =
     effectPoints.find((point) => point.id === selectedEffectPointId) ??
     effectPoints[0] ??
@@ -222,8 +227,8 @@ export function buildCountryEffects({
       source: primary.routeSource,
       summary:
         primary.routeDependence > 0
-          ? `${selectedCountry?.name ?? 'Country'} route dependence around ${primary.routeDependence}% is transmitting crude/LNG pressure.`
-          : 'No active chokepoint-driven energy route shock in this setup.',
+          ? `${selectedCountryName} route dependence: ${primary.routeDependence}% on exposed energy corridors.`
+          : 'No active chokepoint-driven energy route shock.',
     }),
     buildEffectItem({
       id: 'primary-shipping-route',
@@ -232,8 +237,7 @@ export function buildCountryEffects({
       score: primary.shippingRouteScore,
       basis: combineBasisTag([primary.routeBasis]),
       source: primary.routeSource,
-      summary:
-        'Transit risk is raising freight and insurance pressure across the selected corridor.',
+      summary: 'Transit risk lifts freight rates and war-risk insurance premiums.',
     }),
   ]
 
@@ -245,8 +249,7 @@ export function buildCountryEffects({
       score: fuelRetailScore,
       basis: combineBasisTag([primary.routeBasis, profile.fuelPassThrough.basis]),
       source: `${profile.fuelPassThrough.source} | ${primary.routeSource}`,
-      summary:
-        'Petrol and diesel prices absorb imported crude cost and refining-margin shocks.',
+      summary: 'Pump fuel reflects imported crude and refining-margin shocks.',
     }),
     buildEffectItem({
       id: 'secondary-freight',
@@ -258,8 +261,7 @@ export function buildCountryEffects({
         profile.freightPassThrough.basis,
       ]),
       source: `${profile.freightPassThrough.source} | ${primary.routeSource}`,
-      summary:
-        'Container/tanker rerouting and war-risk insurance feed into landed costs.',
+      summary: 'Detours and marine insurance premiums raise landed cargo costs.',
     }),
     buildEffectItem({
       id: 'secondary-inflation',
@@ -274,7 +276,7 @@ export function buildCountryEffects({
       ]),
       source: `${profile.inflationSensitivity.source} | ${profile.currencyPassThrough.source} | ${profile.policyBufferScore.source} | ${profile.strategicReserveDays.source} | ${primary.routeSource}`,
       summary:
-        `Fuel and freight pass-through pushes CPI pressure after transport/input lags; policy buffer ${Math.round(profile.policyBufferScore.value * 100)}/100 and reserve cover ${profile.strategicReserveDays.value} days partially absorb shock.`,
+        `CPI pass-through rises with lag; policy buffer ${Math.round(profile.policyBufferScore.value * 100)}/100 and reserve cover ${profile.strategicReserveDays.value} days dampen part of the shock.`,
     }),
     buildEffectItem({
       id: 'secondary-manufacturing',
@@ -286,8 +288,7 @@ export function buildCountryEffects({
         profile.manufacturingSensitivity.basis,
       ]),
       source: `${profile.manufacturingSensitivity.source} | ${primary.routeSource}`,
-      summary:
-        'Lead-time volatility and transport uncertainty disrupt inventory and production planning.',
+      summary: 'Transport volatility increases input delays and inventory stress.',
     }),
     buildEffectItem({
       id: 'secondary-electricity',
@@ -302,21 +303,118 @@ export function buildCountryEffects({
       source: `${profile.gasPowerSharePct.source} | ${profile.electricityPassThrough.source}`,
       summary:
         profile.gasPowerSharePct.value <= 8
-          ? `Limited effect expected because gas is only ${profile.gasPowerSharePct.value}% of power generation.`
-          : `Gas-based generation share at ${profile.gasPowerSharePct.value}% increases electricity-cost transmission risk.`,
+          ? `Limited effect because gas is only ${profile.gasPowerSharePct.value}% of power generation.`
+          : `Gas power share ${profile.gasPowerSharePct.value}% increases tariff transmission risk.`,
     }),
   ]
 
   const topSecondary = secondaryEffects
     .slice()
     .sort((a, b) => b.score - a.score)[0]
+  const fuelRetail = secondaryEffects.find(
+    (effect) => effect.id === 'secondary-fuel-retail',
+  )
+  const freight = secondaryEffects.find((effect) => effect.id === 'secondary-freight')
+  const inflation = secondaryEffects.find(
+    (effect) => effect.id === 'secondary-inflation',
+  )
+  const manufacturing = secondaryEffects.find(
+    (effect) => effect.id === 'secondary-manufacturing',
+  )
+  const electricity = secondaryEffects.find(
+    (effect) => effect.id === 'secondary-electricity',
+  )
+
+  const immediateHorizonScore = clamp(
+    Math.round(
+      Math.max(primary.energyImportScore, primary.shippingRouteScore),
+    ),
+    0,
+    98,
+  )
+  const nearTermHorizonScore = clamp(
+    Math.round(average([fuelRetail?.score ?? 0, freight?.score ?? 0])),
+    0,
+    98,
+  )
+  const laggedHorizonScore = clamp(
+    Math.round(
+      average([
+        inflation?.score ?? 0,
+        manufacturing?.score ?? 0,
+        electricity?.score ?? 0,
+      ]),
+    ),
+    0,
+    98,
+  )
+
+  const horizonCards = hasPrimaryShock
+    ? [
+        {
+          id: 'immediate',
+          label: 'Immediate',
+          window: '0-14 days',
+          score: immediateHorizonScore,
+          band: scoreBand(immediateHorizonScore),
+          summary: `${toSignalLine('Energy', primary.energyImportScore, scoreBand(primary.energyImportScore))} | ${toSignalLine('Shipping', primary.shippingRouteScore, scoreBand(primary.shippingRouteScore))}`,
+        },
+        {
+          id: 'near-term',
+          label: 'Near-term',
+          window: '2-8 weeks',
+          score: nearTermHorizonScore,
+          band: scoreBand(nearTermHorizonScore),
+          summary: `${toSignalLine('Retail fuel', fuelRetail?.score ?? 0, fuelRetail?.band ?? 'Low')} | ${toSignalLine('Freight', freight?.score ?? 0, freight?.band ?? 'Low')}`,
+        },
+        {
+          id: 'lagged',
+          label: 'Lagged',
+          window: '1-6 months',
+          score: laggedHorizonScore,
+          band: scoreBand(laggedHorizonScore),
+          summary: `${toSignalLine('Inflation', inflation?.score ?? 0, inflation?.band ?? 'Low')} | ${toSignalLine('Industry', manufacturing?.score ?? 0, manufacturing?.band ?? 'Low')} | ${toSignalLine('Electricity', electricity?.score ?? 0, electricity?.band ?? 'Low')}`,
+        },
+      ]
+    : [
+        {
+          id: 'immediate',
+          label: 'Immediate',
+          window: '0-14 days',
+          score: 6,
+          band: scoreBand(6),
+          summary: 'No disruptable chokepoint transmission in this setup.',
+        },
+        {
+          id: 'near-term',
+          label: 'Near-term',
+          window: '2-8 weeks',
+          score: 8,
+          band: scoreBand(8),
+          summary: 'Fuel and freight pass-through remains limited.',
+        },
+        {
+          id: 'lagged',
+          label: 'Lagged',
+          window: '1-6 months',
+          score: 10,
+          band: scoreBand(10),
+          summary: 'Macro downstream pressure remains low.',
+        },
+      ]
 
   const immediateSummary = hasPrimaryShock
-    ? `${selectedCountry?.name ?? 'Selected country'}: strongest secondary pressure is ${topSecondary.label.toLowerCase()} (${topSecondary.score}/100, ${topSecondary.band.toLowerCase()}).`
-    : `${selectedCountry?.name ?? 'Selected country'}: no controllable chokepoint shock in this scenario, so secondary effects remain limited.`
+    ? `${selectedCountryName}: ${topSecondary.label} is the strongest pass-through (${topSecondary.score}/100, ${topSecondary.band.toLowerCase()}).`
+    : `${selectedCountryName}: no controllable chokepoint shock detected, so downstream effects remain limited.`
+
+  const oneLineSummary = hasPrimaryShock
+    ? `${selectedCountryName}: route shock active (${Math.max(primary.energyImportScore, primary.shippingRouteScore)}/100) with fastest pass-through in ${topSecondary.label.toLowerCase()} (${topSecondary.score}/100).`
+    : `${selectedCountryName}: no active route-control shock in this war setup.`
 
   return {
+    oneLineSummary,
     immediateSummary,
+    horizonCards,
     primaryEffects,
     secondaryEffects,
     dataAsOf: countrySecondarySnapshot.asOf,
