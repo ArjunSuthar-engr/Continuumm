@@ -10,6 +10,27 @@ const navItems = [
   { to: '/about', label: 'About' },
 ]
 
+const menuItems = [
+  {
+    to: '/',
+    label: 'Home',
+    code: '01',
+    note: 'Mission brief and platform posture',
+  },
+  {
+    to: '/methodology',
+    label: 'Methodology',
+    code: '02',
+    note: 'How spillover pressure is modeled',
+  },
+  {
+    to: '/about',
+    label: 'About',
+    code: '03',
+    note: 'Intent, scope, and non-goals',
+  },
+]
+
 function SiteLayout() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [headerVisible, setHeaderVisible] = useState(true)
@@ -96,19 +117,29 @@ function SiteLayout() {
 
         {menuOpen ? (
           <nav className="nav-drawer" aria-label="Main navigation">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.to === '/'}
-                className={({ isActive }) =>
-                  `drawer-link ${isActive ? 'drawer-link-active' : ''}`
-                }
-                onClick={handleLinkClick}
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            <p className="nav-drawer-label">Command menu</p>
+            <div className="nav-drawer-grid">
+              {menuItems.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.to === '/'}
+                  className={({ isActive }) =>
+                    `drawer-link ${isActive ? 'drawer-link-active' : ''}`
+                  }
+                  onClick={handleLinkClick}
+                >
+                  <span className="drawer-link-code">{item.code}</span>
+                  <span className="drawer-link-copy">
+                    <span className="drawer-link-title">{item.label}</span>
+                    <span className="drawer-link-note">{item.note}</span>
+                  </span>
+                  <span className="drawer-link-arrow" aria-hidden="true">
+                    {'->'}
+                  </span>
+                </NavLink>
+              ))}
+            </div>
           </nav>
         ) : null}
       </header>

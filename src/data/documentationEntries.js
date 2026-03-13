@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-024',
+    date: '2026-03-14',
+    label: 'Menu redesign',
+    title: 'Rebuilt hamburger menu into a command panel and removed Simulator/Documentation entries',
+    summary:
+      'The hamburger interaction now opens a styled command-panel grid and intentionally excludes Simulator and Documentation, leaving those routes to their dedicated primary access points.',
+    items: [
+      'Removed Simulator and Documentation from the hamburger menu items.',
+      'Converted plain stacked menu links into structured command cards with code, title, note, and directional cue.',
+      'Added responsive behavior so the command cards flow to one column on smaller screens.',
+    ],
+    review:
+      'Check hamburger menu feel, readability, and spacing on desktop/mobile, and confirm only Home, Methodology, and About appear.',
+  },
+  {
     id: 'log-023',
     date: '2026-03-14',
     label: 'Header controls',

@@ -370,24 +370,72 @@
   }
 
   .nav-drawer {
-    @apply mx-auto mt-3 grid w-full max-w-[1680px] gap-2 border-t px-4 pt-3 sm:grid-cols-2 sm:px-5 lg:grid-cols-5 lg:px-6;
+    @apply mx-auto mt-3 w-full max-w-[1680px] border-t px-4 pb-1 pt-3 sm:px-5 lg:px-6;
     border-color: var(--theme-border);
+    animation: panelLift 220ms ease both;
+  }
+
+  .nav-drawer-label {
+    @apply mono mb-3 text-[10px] uppercase tracking-[0.3em];
+    color: var(--theme-text-faint);
+  }
+
+  .nav-drawer-grid {
+    @apply grid gap-2 md:grid-cols-3;
   }
 
   .drawer-link {
-    @apply rounded-lg border px-3 py-2 text-sm no-underline transition;
+    @apply flex items-center gap-3 rounded-[8px] border px-3 py-3 no-underline transition;
     border-color: var(--theme-border);
     color: var(--theme-text-base);
     background: var(--theme-soft-surface);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+  }
+
+  .drawer-link-code {
+    @apply mono inline-flex h-8 w-8 items-center justify-center rounded-full border text-[10px] tracking-[0.18em];
+    border-color: var(--theme-border);
+    color: var(--theme-text-faint);
+    background: var(--theme-contrast-surface);
+  }
+
+  .drawer-link-copy {
+    @apply flex min-w-0 flex-1 flex-col;
+  }
+
+  .drawer-link-title {
+    @apply text-sm font-semibold leading-tight;
+    color: var(--theme-text-strong);
+  }
+
+  .drawer-link-note {
+    @apply mt-1 text-xs leading-5;
+    color: var(--theme-text-muted);
+  }
+
+  .drawer-link-arrow {
+    @apply mono text-xs tracking-[0.18em];
+    color: var(--theme-text-faint);
   }
 
   .drawer-link:hover {
+    transform: translateX(2px);
     background: var(--theme-soft-surface-hover);
   }
 
   .drawer-link-active {
     border-color: var(--theme-border-strong);
     background: var(--theme-soft-surface-hover);
+    box-shadow: inset 0 0 0 1px var(--theme-accent-border);
+    color: var(--theme-text-strong);
+  }
+
+  .drawer-link-active .drawer-link-code {
+    border-color: var(--theme-accent-border);
+    color: var(--theme-text-strong);
+  }
+
+  .drawer-link-active .drawer-link-arrow {
     color: var(--theme-text-strong);
   }
 
@@ -1277,6 +1325,10 @@
   .icon-button {
     height: 2.5rem;
     width: 2.5rem;
+  }
+
+  .nav-drawer-grid {
+    grid-template-columns: 1fr;
   }
 
   .landing-headline {
