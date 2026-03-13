@@ -31,6 +31,7 @@ export const chokepoints = [
     name: 'Strait of Hormuz',
     region: 'Gulf',
     position: { x: 63, y: 45 },
+    coordinates: { lat: 26.5, lng: 56.2 },
     pressure: 32,
     note: 'Crude and LNG export pressure radiates quickly into Asia and Europe.',
     exposures: {
@@ -52,6 +53,7 @@ export const chokepoints = [
     name: 'Suez Canal',
     region: 'Eastern Mediterranean',
     position: { x: 57, y: 39 },
+    coordinates: { lat: 30.5, lng: 32.3 },
     pressure: 24,
     note: 'A closure lengthens Europe-Asia trade loops and squeezes tanker schedules.',
     exposures: {
@@ -73,6 +75,7 @@ export const chokepoints = [
     name: 'Strait of Malacca',
     region: 'Southeast Asia',
     position: { x: 78, y: 54 },
+    coordinates: { lat: 2.5, lng: 101.0 },
     pressure: 28,
     note: 'Container and fuel traffic bottlenecks here ripple through Asian manufacturing.',
     exposures: {
@@ -92,6 +95,7 @@ export const chokepoints = [
     name: 'Bosporus',
     region: 'Black Sea',
     position: { x: 58, y: 29 },
+    coordinates: { lat: 41.1, lng: 29.0 },
     pressure: 18,
     note: 'Black Sea access constraints stack strategic and grain-market pressure.',
     exposures: {
@@ -108,6 +112,7 @@ export const chokepoints = [
     name: 'Bab el-Mandeb',
     region: 'Red Sea',
     position: { x: 58, y: 47 },
+    coordinates: { lat: 12.6, lng: 43.4 },
     pressure: 22,
     note: 'Red Sea instability compounds insurance costs and fuel delivery delays.',
     exposures: {
@@ -130,6 +135,7 @@ export const countries = [
     name: 'United States',
     region: 'North America',
     position: { x: 16, y: 31 },
+    coordinates: { lat: 38.0, lng: -97.0 },
     resilience: 85,
     shippingSensitivity: 36,
     tradeLinks: {
@@ -169,6 +175,7 @@ export const countries = [
     name: 'China',
     region: 'East Asia',
     position: { x: 79, y: 34 },
+    coordinates: { lat: 35.8, lng: 103.8 },
     resilience: 72,
     shippingSensitivity: 62,
     tradeLinks: {
@@ -206,6 +213,7 @@ export const countries = [
     name: 'Russia',
     region: 'Eurasia',
     position: { x: 61, y: 16 },
+    coordinates: { lat: 61.5, lng: 105.3 },
     resilience: 58,
     shippingSensitivity: 24,
     tradeLinks: {
@@ -239,6 +247,7 @@ export const countries = [
     name: 'Germany',
     region: 'Europe',
     position: { x: 50, y: 25 },
+    coordinates: { lat: 51.1, lng: 10.4 },
     resilience: 77,
     shippingSensitivity: 42,
     tradeLinks: {
@@ -277,6 +286,7 @@ export const countries = [
     name: 'India',
     region: 'South Asia',
     position: { x: 68, y: 44 },
+    coordinates: { lat: 22.6, lng: 79.0 },
     resilience: 68,
     shippingSensitivity: 54,
     tradeLinks: {
@@ -313,6 +323,7 @@ export const countries = [
     name: 'Japan',
     region: 'East Asia',
     position: { x: 88, y: 29 },
+    coordinates: { lat: 36.2, lng: 138.2 },
     resilience: 79,
     shippingSensitivity: 58,
     tradeLinks: {
@@ -348,6 +359,7 @@ export const countries = [
     name: 'South Korea',
     region: 'East Asia',
     position: { x: 84, y: 31 },
+    coordinates: { lat: 36.3, lng: 127.9 },
     resilience: 74,
     shippingSensitivity: 55,
     tradeLinks: {
@@ -378,6 +390,7 @@ export const countries = [
     name: 'Saudi Arabia',
     region: 'Middle East',
     position: { x: 59, y: 42 },
+    coordinates: { lat: 24.0, lng: 45.0 },
     resilience: 64,
     shippingSensitivity: 41,
     tradeLinks: {
@@ -415,6 +428,7 @@ export const countries = [
     name: 'Iran',
     region: 'Middle East',
     position: { x: 65, y: 41 },
+    coordinates: { lat: 32.4, lng: 54.2 },
     resilience: 46,
     shippingSensitivity: 28,
     tradeLinks: {
@@ -447,6 +461,7 @@ export const countries = [
     name: 'Israel',
     region: 'Middle East',
     position: { x: 56, y: 36 },
+    coordinates: { lat: 31.0, lng: 35.1 },
     resilience: 67,
     shippingSensitivity: 33,
     tradeLinks: {
@@ -480,6 +495,7 @@ export const countries = [
     name: 'Turkey',
     region: 'Eastern Mediterranean',
     position: { x: 55, y: 31 },
+    coordinates: { lat: 39.0, lng: 35.2 },
     resilience: 59,
     shippingSensitivity: 39,
     tradeLinks: {
@@ -512,6 +528,7 @@ export const countries = [
     name: 'Egypt',
     region: 'Eastern Mediterranean',
     position: { x: 54, y: 38 },
+    coordinates: { lat: 26.8, lng: 30.8 },
     resilience: 52,
     shippingSensitivity: 44,
     tradeLinks: {
@@ -541,6 +558,7 @@ export const countries = [
     name: 'Singapore',
     region: 'Southeast Asia',
     position: { x: 76, y: 57 },
+    coordinates: { lat: 1.35, lng: 103.8 },
     resilience: 71,
     shippingSensitivity: 69,
     tradeLinks: {

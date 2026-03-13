@@ -10,6 +10,7 @@ shipping routes, and strategic chokepoints.
 - Vite
 - Tailwind CSS
 - React Router
+- Leaflet + React Leaflet
 - Firebase Hosting (planned deployment target)
 
 ## Current Pages

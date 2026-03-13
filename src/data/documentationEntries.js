@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-011',
+    date: '2026-03-14',
+    label: 'Simulator redesign',
+    title: 'Simplified simulator into a strict three-pane workflow',
+    summary:
+      'The simulator was rebuilt around a clear left-middle-right structure: war selection on the left, an interactive world effects map in the center, and single-country impact analysis on the right.',
+    items: [
+      'Added auto-derived red chokepoint highlighting from the selected war pair, including explicit US-Iran full chokepoint escalation behavior.',
+      'Replaced the abstract map board with an interactive Leaflet world map (pan/zoom/click) and chokepoint effect drill-down.',
+      'Added a dedicated right-side country analysis panel with direct country selection and impact/chokepoint reasoning.',
+    ],
+    review:
+      'Test if the page now feels intuitive as three clear surfaces and verify that clicking red chokepoints explains downstream country effects clearly.',
+  },
+  {
     id: 'log-010',
     date: '2026-03-13',
     label: 'Live simulator',

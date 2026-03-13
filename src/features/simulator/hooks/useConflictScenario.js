@@ -2,13 +2,23 @@ import { useEffect, useRef, useState } from 'react'
 import { defaultScenarioConfig } from '../data/defaultScenario.js'
 import { countries, countriesById } from '../data/network.js'
 import { defaultPresetId, scenarioPresets } from '../data/scenarioPresets.js'
+import { deriveConflictChokepoints } from '../lib/deriveConflictChokepoints.js'
 import { fetchLiveSignalsSnapshot } from '../lib/fetchLiveSignals.js'
 import { simulateConflict } from '../lib/simulateConflict.js'
 
 function cloneInitialConfig(initialConfig) {
-  return {
+  const baseConfig = {
     ...initialConfig,
     blockedChokepointIds: [...initialConfig.blockedChokepointIds],
+  }
+
+  return {
+    ...baseConfig,
+    blockedChokepointIds: deriveConflictChokepoints({
+      aggressorId: baseConfig.aggressorId,
+      defenderId: baseConfig.defenderId,
+      intensity: baseConfig.intensity,
+    }),
   }
 }
 
@@ -16,10 +26,14 @@ function getFallbackCountryId(excludedId) {
   return countries.find((country) => country.id !== excludedId)?.id ?? excludedId
 }
 
-export function useConflictScenario(initialConfig = defaultScenarioConfig) {
+export function useConflictScenario(
+  initialConfig = defaultScenarioConfig,
+  options = {},
+) {
+  const enableLive = options.enableLive ?? true
   const [config, setConfig] = useState(() => cloneInitialConfig(initialConfig))
   const [activePresetId, setActivePresetId] = useState(defaultPresetId)
-  const [liveOverlayEnabled, setLiveOverlayEnabled] = useState(true)
+  const [liveOverlayEnabled, setLiveOverlayEnabled] = useState(enableLive)
   const [liveSignals, setLiveSignals] = useState(null)
   const [liveStatus, setLiveStatus] = useState('idle')
   const [liveError, setLiveError] = useState('')
@@ -29,7 +43,7 @@ export function useConflictScenario(initialConfig = defaultScenarioConfig) {
     setActivePresetId(null)
     setConfig((current) => {
       if (kind === 'aggressor') {
-        return {
+        const next = {
           ...current,
           aggressorId: value,
           defenderId:
@@ -37,15 +51,33 @@ export function useConflictScenario(initialConfig = defaultScenarioConfig) {
               ? getFallbackCountryId(value)
               : current.defenderId,
         }
+
+        return {
+          ...next,
+          blockedChokepointIds: deriveConflictChokepoints({
+            aggressorId: next.aggressorId,
+            defenderId: next.defenderId,
+            intensity: next.intensity,
+          }),
+        }
       }
 
-      return {
+      const next = {
         ...current,
         defenderId: value,
         aggressorId:
           value === current.aggressorId
             ? getFallbackCountryId(value)
             : current.aggressorId,
+      }
+
+      return {
+        ...next,
+        blockedChokepointIds: deriveConflictChokepoints({
+          aggressorId: next.aggressorId,
+          defenderId: next.defenderId,
+          intensity: next.intensity,
+        }),
       }
     })
   }
@@ -55,6 +87,11 @@ export function useConflictScenario(initialConfig = defaultScenarioConfig) {
     setConfig((current) => ({
       ...current,
       intensity,
+      blockedChokepointIds: deriveConflictChokepoints({
+        aggressorId: current.aggressorId,
+        defenderId: current.defenderId,
+        intensity,
+      }),
     }))
   }
 
@@ -77,6 +114,10 @@ export function useConflictScenario(initialConfig = defaultScenarioConfig) {
   }
 
   async function refreshLiveSignals(options = {}) {
+    if (!enableLive) {
+      return null
+    }
+
     const requestId = requestSequenceRef.current + 1
     requestSequenceRef.current = requestId
     setLiveStatus('loading')
@@ -130,14 +171,20 @@ export function useConflictScenario(initialConfig = defaultScenarioConfig) {
     setConfig((current) => ({
       ...current,
       ...preset.config,
-      blockedChokepointIds: [...preset.config.blockedChokepointIds],
+      blockedChokepointIds: deriveConflictChokepoints({
+        aggressorId: preset.config.aggressorId,
+        defenderId: preset.config.defenderId,
+        intensity: preset.config.intensity,
+      }),
     }))
 
-    refreshLiveSignals({
-      aggressorId: preset.config.aggressorId,
-      defenderId: preset.config.defenderId,
-      contextActorIds: preset.contextActorIds,
-    })
+    if (enableLive) {
+      refreshLiveSignals({
+        aggressorId: preset.config.aggressorId,
+        defenderId: preset.config.defenderId,
+        contextActorIds: preset.contextActorIds,
+      })
+    }
   }
 
   function applyLiveSuggestions() {
@@ -160,6 +207,10 @@ export function useConflictScenario(initialConfig = defaultScenarioConfig) {
   }
 
   useEffect(() => {
+    if (!enableLive) {
+      return
+    }
+
     const initialPreset = scenarioPresets.find(
       (candidate) => candidate.id === defaultPresetId,
     )
@@ -177,7 +228,7 @@ export function useConflictScenario(initialConfig = defaultScenarioConfig) {
     ...config,
     scenario: simulateConflict({
       ...config,
-      liveSignals: liveOverlayEnabled ? liveSignals : null,
+      liveSignals: enableLive && liveOverlayEnabled ? liveSignals : null,
     }),
     presets: scenarioPresets,
     activePresetId,
