@@ -41,7 +41,7 @@ function ImpactSidebar({ topCountries }) {
               </div>
             </div>
 
-            <div className="mt-4 h-2 rounded-full bg-white/6">
+            <div className="progress-track mt-4 h-2 rounded-full">
               <div
                 className="h-full rounded-full bg-[linear-gradient(90deg,#d2b48c,#ff9d5c)]"
                 style={{ width: `${country.totalScore}%` }}

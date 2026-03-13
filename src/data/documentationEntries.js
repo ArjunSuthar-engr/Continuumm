@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-008',
+    date: '2026-03-13',
+    label: 'Theme',
+    title: 'Added a persistent light theme across the multi-page experience',
+    summary:
+      'Continuumm now supports both dark and light presentation modes with a shared theme toggle, stored user preference, and tokenized surface styling so the look stays coherent across every page.',
+    items: [
+      'Added a persistent theme toggle in the shared header and stored the user preference locally.',
+      'Reworked core layout, hero surfaces, panels, and simulator map styling around theme-aware design tokens.',
+      'Extended the visual system so the lighter presentation still feels maritime and analytical rather than generic.',
+    ],
+    review:
+      'Check both themes on the home page and simulator page, then note which mode feels stronger and where contrast still needs adjustment.',
+  },
+  {
     id: 'log-007',
     date: '2026-03-13',
     label: 'Release',

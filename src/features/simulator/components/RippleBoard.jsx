@@ -31,7 +31,7 @@ function RippleBoard({ scenario, blockedChokepointIds }) {
         </p>
       </div>
 
-      <div className="rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(5,15,23,0.88),rgba(9,25,37,0.78))] p-4 sm:p-5">
+      <div className="board-shell p-4 sm:p-5">
         <div className="flex flex-col gap-4 border-b border-white/10 pb-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="eyebrow">

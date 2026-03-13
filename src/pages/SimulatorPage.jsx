@@ -23,7 +23,7 @@ function SimulatorPage() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(7,17,26,0.94),rgba(11,32,46,0.8)_55%,rgba(164,112,68,0.16))] px-5 py-8 sm:px-6 lg:px-8">
+      <section className="hero-shell px-5 py-8 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
           <div>
             <p className="eyebrow">Simulator / live prototype</p>

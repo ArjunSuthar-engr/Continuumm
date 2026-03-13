@@ -9,6 +9,20 @@
       content="Continuumm is a web-based geopolitical impact simulator that visualizes how conflict can disrupt trade, energy, and strategic chokepoints across the world."
     />
     <title>Continuumm</title>
+    <script>
+      ;(() => {
+        const storedTheme = window.localStorage.getItem('continuumm-theme')
+        const preferredTheme =
+          storedTheme === 'dark' || storedTheme === 'light'
+            ? storedTheme
+            : window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark'
+
+        document.documentElement.dataset.theme = preferredTheme
+        document.documentElement.style.colorScheme = preferredTheme
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

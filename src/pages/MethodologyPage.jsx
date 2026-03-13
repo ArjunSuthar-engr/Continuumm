@@ -9,7 +9,7 @@ import {
 function MethodologyPage() {
   return (
     <div className="space-y-6">
-      <section className="rounded-[28px] border border-white/10 bg-[linear-gradient(135deg,rgba(7,17,26,0.94),rgba(9,28,42,0.78)_55%,rgba(164,112,68,0.14))] px-5 py-8 sm:px-6 lg:px-8">
+      <section className="hero-shell px-5 py-8 sm:px-6 lg:px-8">
         <p className="eyebrow">Methodology</p>
         <h1 className="mt-4 max-w-4xl text-5xl leading-none text-stone-100 sm:text-6xl">
           Explain the mechanism, the inputs, and the limits before the user trusts
