@@ -4,6 +4,8 @@ Continuumm is a web-based geopolitical impact simulator that visualizes how war
 between two countries can create second-order effects across trade, energy,
 shipping routes, and strategic chokepoints.
 
+Live app: https://continuumm.web.app/
+
 ## Stack
 
 - React

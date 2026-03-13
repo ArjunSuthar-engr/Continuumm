@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-034',
+    date: '2026-03-14',
+    label: 'Live link',
+    title: 'Added the production web app URL to README',
+    summary:
+      'The repository README now includes a direct link to the live Continuumm deployment for faster project access from GitHub.',
+    items: [
+      'Added `https://continuumm.web.app/` near the top of README as the canonical live app URL.',
+      'Kept the change minimal so repository onboarding remains clear and quick.',
+      'No simulator logic or model behavior was changed in this update.',
+    ],
+    review:
+      'Open the README in GitHub and verify the live app URL is visible near the project intro.',
+  },
+  {
     id: 'log-033',
     date: '2026-03-14',
     label: 'Validation and calibration',
