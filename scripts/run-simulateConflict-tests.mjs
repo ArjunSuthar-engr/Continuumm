@@ -4,6 +4,7 @@ import { buildEffectPoints } from '../src/features/simulator/lib/buildEffectPoin
 import { deriveConflictChokepoints } from '../src/features/simulator/lib/deriveConflictChokepoints.js'
 import { getCountrySecondaryProfile } from '../src/features/simulator/data/countrySecondaryProfiles.js'
 import {
+  getConflictChokepointControl,
   getCountryRouteAugmenters,
   getCountryRouteDependence,
 } from '../src/features/simulator/data/routeReality.js'
@@ -319,6 +320,164 @@ runTest('effect-point metadata includes route augmenter fields', () => {
   assert.equal(typeof point.lngImportExposurePct, 'number')
   assert.equal(typeof point.portConcentrationScore, 'number')
   assert.equal(point.routeShareRawPct >= point.modelledImportShare, true)
+})
+
+runTest('suez control threshold flips across escalation posture for israel-iran pair', () => {
+  const lowPosture = getConflictChokepointControl({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    chokepointId: 'suez',
+    intensity: 55,
+    conflictModeId: 'sanctions',
+    durationId: '2w',
+  })
+  const highPosture = getConflictChokepointControl({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    chokepointId: 'suez',
+    intensity: 95,
+    conflictModeId: 'blockade',
+    durationId: '6m',
+  })
+
+  assert.equal(lowPosture.canDisrupt, false)
+  assert.equal(highPosture.canDisrupt, true)
+  assert.equal(lowPosture.effectiveScore < lowPosture.threshold, true)
+  assert.equal(highPosture.effectiveScore >= highPosture.threshold, true)
+  assert.equal(
+    Math.round((highPosture.effectiveScore - lowPosture.effectiveScore) * 100) >= 15,
+    true,
+  )
+})
+
+runTest('non-controller conflict pair yields no disruptable chokepoints', () => {
+  const blocked = deriveConflictChokepoints({
+    aggressorId: 'india',
+    defenderId: 'germany',
+    conflictModeId: 'blockade',
+    durationId: '6m',
+    intensity: 95,
+  })
+
+  assert.equal(blocked.length, 0)
+})
+
+runTest('hormuz calibration: india fuel pressure stays materially above electricity', () => {
+  const blockedChokepointIds = deriveConflictChokepoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+  })
+  const scenario = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    blockedChokepointIds,
+  })
+  const effectPoints = buildEffectPoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    selectedCountryId: 'india',
+    blockedChokepointIds,
+  })
+  const hormuzPoint = effectPoints.find((point) => point.id === 'hormuz')
+
+  assert.equal(Boolean(hormuzPoint), true)
+  assert.equal(hormuzPoint.modelledImportShare >= 30, true)
+
+  const countryEffects = buildCountryEffects({
+    scenario,
+    effectPoints,
+    selectedCountryId: 'india',
+    selectedEffectPointId: hormuzPoint.id,
+  })
+  const fuel = countryEffects.secondaryEffects.find(
+    (effect) => effect.id === 'secondary-fuel-retail',
+  )
+  const power = countryEffects.secondaryEffects.find(
+    (effect) => effect.id === 'secondary-electricity',
+  )
+
+  assert.equal(Boolean(fuel), true)
+  assert.equal(Boolean(power), true)
+  assert.equal(fuel.score >= 58, true)
+  assert.equal(fuel.score - power.score >= 18, true)
+})
+
+runTest('blockade posture produces stronger maritime system stress than sanctions posture', () => {
+  const blockadeBlocked = deriveConflictChokepoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+  })
+  const sanctionsBlocked = deriveConflictChokepoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'sanctions',
+    durationId: '2m',
+    intensity: 80,
+  })
+
+  const blockadeScenario = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    blockedChokepointIds: blockadeBlocked,
+  })
+  const sanctionsScenario = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'sanctions',
+    durationId: '2m',
+    intensity: 80,
+    blockedChokepointIds: sanctionsBlocked,
+  })
+
+  const blockadePoints = buildEffectPoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    selectedCountryId: 'india',
+    blockedChokepointIds: blockadeBlocked,
+  })
+  const sanctionsPoints = buildEffectPoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'sanctions',
+    durationId: '2m',
+    intensity: 80,
+    selectedCountryId: 'india',
+    blockedChokepointIds: sanctionsBlocked,
+  })
+
+  assert.equal(blockadePoints.length >= sanctionsPoints.length, true)
+  assert.equal(blockadeBlocked.includes('bab-el-mandeb'), true)
+  assert.equal(sanctionsBlocked.includes('bab-el-mandeb'), false)
+  assert.equal(
+    blockadeScenario.channelPressure.shipping >
+      sanctionsScenario.channelPressure.shipping,
+    true,
+  )
+  assert.equal(
+    blockadeScenario.summary.detourMiles > sanctionsScenario.summary.detourMiles,
+    true,
+  )
 })
 
 console.log('All simulator checks passed.')

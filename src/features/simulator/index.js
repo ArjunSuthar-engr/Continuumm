@@ -20,6 +20,12 @@ export {
 export { chokepoints, countries, focusModes } from './data/network.js'
 export { defaultPresetId, scenarioPresets } from './data/scenarioPresets.js'
 export {
+  calibrationEpisodes,
+  calibrationSnapshot,
+  simulatorAssumptions,
+  simulatorLimitations,
+} from './data/calibrationEpisodes.js'
+export {
   getChokepointModalProfile,
   getConflictChokepointControl,
   getConflictControlMap,

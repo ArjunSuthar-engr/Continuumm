@@ -1,9 +1,17 @@
-import { focusModes, chokepoints, countries } from '../features/simulator'
+import {
+  calibrationEpisodes,
+  calibrationSnapshot,
+  chokepoints,
+  countries,
+  focusModes,
+  simulatorAssumptions,
+  simulatorLimitations,
+} from '../features/simulator'
 import {
   channelDescriptions,
-  limitations,
   methodologyPrinciples,
   methodologySteps,
+  limitations as prototypeLimitations,
 } from '../data/projectContent'
 
 function MethodologyPage() {
@@ -129,33 +137,105 @@ function MethodologyPage() {
         <section className="panel">
           <div className="panel-head">
             <div>
-              <p className="eyebrow">Current constraints</p>
-              <h2 className="panel-title">What the prototype does not yet model</h2>
+              <p className="eyebrow">Assumptions and limits</p>
+              <h2 className="panel-title">Model assumptions and known limitations</h2>
             </div>
             <p className="panel-copy">
-              This matters because product trust depends as much on declared limits
-              as on visual confidence.
+              These declarations are part of the model contract and are updated as
+              realism coverage improves.
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            {limitations.map((item) => (
+          <div className="space-y-3">
+            {simulatorAssumptions.map((item) => (
               <article key={item} className="story-card">
+                <p className="eyebrow">Assumption</p>
                 <p className="text-sm leading-7 text-slate-300">{item}</p>
               </article>
             ))}
-            <article className="story-card md:col-span-2">
-              <p className="eyebrow">Seed network size</p>
-              <h3 className="mt-3 text-2xl text-stone-100">
-                {countries.length} countries / {chokepoints.length} chokepoints
-              </h3>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
-                The current prototype is deliberately small so the model remains
-                explainable while the visual system is still being shaped.
-              </p>
-            </article>
+            {simulatorLimitations.map((item) => (
+              <article key={item} className="story-card">
+                <p className="eyebrow">Limitation</p>
+                <p className="text-sm leading-7 text-slate-300">{item}</p>
+              </article>
+            ))}
           </div>
         </section>
+      </section>
+
+      <section className="panel">
+        <div className="panel-head">
+          <div>
+            <p className="eyebrow">Calibration checkpoints</p>
+            <h2 className="panel-title">Known-episode validation and calibration</h2>
+          </div>
+          <p className="panel-copy">
+            Continuumm validates against directional checkpoints so control gating
+            and downstream sensitivity stay coherent with published route realities.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {calibrationEpisodes.map((episode) => (
+            <article key={episode.id} className="story-card">
+              <p className="eyebrow">Calibration episode</p>
+              <h3 className="mt-3 text-2xl text-stone-100">{episode.title}</h3>
+              <p className="mono mt-2 text-[11px] uppercase tracking-[0.18em] text-slate-400">
+                {episode.scenarioLabel}
+              </p>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                {episode.summary}
+              </p>
+              <div className="mt-3 space-y-2">
+                {episode.thresholds.map((threshold) => (
+                  <p key={threshold} className="text-sm leading-6 text-slate-300">
+                    • {threshold}
+                  </p>
+                ))}
+              </div>
+            </article>
+          ))}
+
+          <article className="story-card md:col-span-2">
+            <p className="eyebrow">Calibration data basis</p>
+            <h3 className="mt-3 text-2xl text-stone-100">
+              Snapshot as of {calibrationSnapshot.asOf}
+            </h3>
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              {calibrationSnapshot.note}
+            </p>
+            <div className="mt-4 grid gap-2 md:grid-cols-2">
+              {calibrationSnapshot.sources.map((source) => (
+                <a
+                  key={source.id}
+                  href={source.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="route-card"
+                >
+                  <p className="eyebrow">Source</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-300">
+                    {source.label}
+                  </p>
+                </a>
+              ))}
+            </div>
+          </article>
+
+          <article className="story-card md:col-span-2">
+            <p className="eyebrow">Prototype coverage boundary</p>
+            <h3 className="mt-3 text-2xl text-stone-100">
+              {countries.length} countries / {chokepoints.length} chokepoints
+            </h3>
+            <div className="mt-3 space-y-2">
+              {prototypeLimitations.map((item) => (
+                <p key={item} className="text-sm leading-6 text-slate-300">
+                  • {item}
+                </p>
+              ))}
+            </div>
+          </article>
+        </div>
       </section>
     </div>
   )

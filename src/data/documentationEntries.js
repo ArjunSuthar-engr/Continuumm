@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-033',
+    date: '2026-03-14',
+    label: 'Validation and calibration',
+    title: 'Added control-threshold calibration tests and methodology assumptions/limits',
+    summary:
+      'The simulator now includes explicit M6 validation checkpoints: deterministic threshold tests, known-episode calibration checks for Hormuz and India fuel sensitivity, and a hardened Methodology section with declared model assumptions and limitations.',
+    items: [
+      'Added deterministic tests for control-threshold behavior (including Suez threshold flip and non-controller no-disruption cases).',
+      'Added calibration checks for Hormuz-driven India fuel sensitivity and sanctions-vs-blockade pass-through differences.',
+      'Expanded Methodology with model assumptions, known limitations, and named calibration checkpoints with source references.',
+    ],
+    review:
+      'Open Methodology and verify assumptions/limitations are explicit, then run simulator scenarios around Israel-Iran and confirm behavior matches calibration direction.',
+  },
+  {
     id: 'log-032',
     date: '2026-03-14',
     label: 'UX clarity compression',
