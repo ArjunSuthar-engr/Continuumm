@@ -1,10 +1,7 @@
 import { Link } from 'react-router-dom'
 import { documentationEntries } from '../data/documentationEntries'
 import { siteSections } from '../data/projectContent'
-import {
-  defaultScenarioConfig,
-  simulateConflict,
-} from '../features/simulator'
+import { defaultScenarioConfig, simulateConflict } from '../features/simulator'
 
 function HomePage() {
   const snapshot = simulateConflict(defaultScenarioConfig)
@@ -12,22 +9,22 @@ function HomePage() {
 
   return (
     <div className="space-y-6">
-      <section className="hero-shell px-5 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-8 xl:grid-cols-[1.3fr_0.7fr] xl:items-end">
+      <section className="hero-shell hero-command px-5 py-9 sm:px-6 lg:px-8">
+        <div className="grid gap-8 xl:grid-cols-[1.35fr_0.65fr]">
           <div className="max-w-4xl">
-            <p className="eyebrow">Home / Continuumm</p>
-            <h1 className="mt-4 max-w-4xl text-5xl leading-none text-stone-100 sm:text-6xl xl:text-7xl">
-              A geopolitical impact simulator for a world tied together by trade,
-              fuel, and fragile sea lanes.
+            <p className="eyebrow">Home / Theater briefing</p>
+            <h1 className="hero-title mt-4 max-w-5xl text-5xl leading-none text-stone-100 sm:text-6xl xl:text-7xl">
+              The world does not break at the frontline.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-              Continuumm is designed to show how conflict between any two countries
-              can radiate into distant economies through chokepoints, shipping
-              detours, energy shocks, and strategic realignment.
+              Continuumm maps how conflict between two countries can propagate
+              through fuel routes, trade corridors, and strategic chokepoints. This
+              is an operations interface for structural vulnerability, not a black-box
+              forecast.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/simulator" className="route-cta">
-                Enter Simulator
+                Enter Theater
               </Link>
               <Link to="/methodology" className="nav-link">
                 Read Methodology
@@ -35,21 +32,61 @@ function HomePage() {
             </div>
           </div>
 
-          <div className="grid gap-3">
-            <article className="metric-card">
-              <span className="metric-label">Current prototype</span>
-              <strong className="metric-value">Multi-page architecture</strong>
-              <p className="metric-copy">
-                The site is now split into product pages so simulator work,
-                methodology, and project history can evolve independently.
+          <div className="dispatch-column">
+            <article className="dispatch-card">
+              <p className="eyebrow">Latest dispatch</p>
+              <h2 className="mt-3 text-3xl leading-none text-stone-100">
+                {latestLog.label}
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                {latestLog.title}
               </p>
             </article>
-            <article className="metric-card">
-              <span className="metric-label">Latest public update</span>
-              <strong className="metric-value">{latestLog.title}</strong>
-              <p className="metric-copy">{latestLog.summary}</p>
+            <article className="dispatch-card">
+              <p className="eyebrow">Current scenario signal</p>
+              <div className="mt-4 grid gap-3">
+                <div className="signal-row">
+                  <span className="signal-row-label">System stress</span>
+                  <strong className="signal-row-value">
+                    {snapshot.summary.systemicStress}
+                  </strong>
+                </div>
+                <div className="signal-row">
+                  <span className="signal-row-label">Fuel pressure</span>
+                  <strong className="signal-row-value">
+                    {snapshot.summary.fuelPressure}/100
+                  </strong>
+                </div>
+                <div className="signal-row">
+                  <span className="signal-row-label">Top spillover</span>
+                  <strong className="signal-row-value">
+                    {snapshot.topAffected[0].name}
+                  </strong>
+                </div>
+              </div>
             </article>
           </div>
+        </div>
+
+        <div className="briefing-strip mt-8 grid gap-3 md:grid-cols-3">
+          <article className="briefing-chip">
+            <p className="eyebrow">Mission doctrine</p>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              Structural analysis over deterministic prediction.
+            </p>
+          </article>
+          <article className="briefing-chip">
+            <p className="eyebrow">Primary lens</p>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              Trade, energy, shipping, and alliance stress in one theater view.
+            </p>
+          </article>
+          <article className="briefing-chip">
+            <p className="eyebrow">Default conflict pair</p>
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              {snapshot.aggressor.name} vs {snapshot.defender.name}
+            </p>
+          </article>
         </div>
       </section>
 
@@ -58,7 +95,7 @@ function HomePage() {
           <div className="panel-head">
             <div>
               <p className="eyebrow">Snapshot scenario</p>
-              <h2 className="panel-title">What the current prototype already shows</h2>
+              <h2 className="panel-title">Current theater readout</h2>
             </div>
             <p className="panel-copy">
               A default China vs. United States scenario is used here to show the
@@ -105,7 +142,7 @@ function HomePage() {
           <div className="panel-head">
             <div>
               <p className="eyebrow">Primary surfaces</p>
-              <h2 className="panel-title">How the website is now divided</h2>
+              <h2 className="panel-title">Operational surfaces</h2>
             </div>
             <p className="panel-copy">
               Each page owns a clear responsibility, which keeps editing tighter and
@@ -165,7 +202,7 @@ function HomePage() {
           <div className="panel-head">
             <div>
               <p className="eyebrow">Intent</p>
-              <h2 className="panel-title">What Continuumm is trying to become</h2>
+              <h2 className="panel-title">Continuumm build intent</h2>
             </div>
             <p className="panel-copy">
               The near-term goal is not a finished intelligence platform. It is a

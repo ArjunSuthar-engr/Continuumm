@@ -23,11 +23,11 @@ function SimulatorPage() {
 
   return (
     <div className="space-y-6">
-      <section className="hero-shell px-5 py-8 sm:px-6 lg:px-8">
-        <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
+      <section className="hero-shell hero-command px-5 py-9 sm:px-6 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
-            <p className="eyebrow">Simulator / live prototype</p>
-            <h1 className="mt-4 text-5xl leading-none text-stone-100 sm:text-6xl">
+            <p className="eyebrow">Simulator / command theater</p>
+            <h1 className="hero-title mt-4 text-5xl leading-none text-stone-100 sm:text-6xl">
               Model war as a system shock, not an isolated front.
             </h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
@@ -37,39 +37,45 @@ function SimulatorPage() {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-3">
-            <article className="metric-card">
-              <span className="metric-label">Systemic stress</span>
-              <strong className="metric-value">
-                {scenario.summary.systemicStress}
-              </strong>
-              <p className="metric-copy">
-                Average exposure of the five most affected external states.
+          <div className="dispatch-column">
+            <article className="dispatch-card">
+              <p className="eyebrow">Conflict pair</p>
+              <h2 className="mt-3 text-3xl leading-none text-stone-100">
+                {scenario.aggressor.name} vs {scenario.defender.name}
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                Focus mode: {scenario.focusMode.label}. Blocked gateways:{' '}
+                {scenario.blockedChokepoints.length}.
               </p>
             </article>
-            <article className="metric-card">
-              <span className="metric-label">Fuel pressure</span>
-              <strong className="metric-value">
-                {scenario.summary.fuelPressure}/100
-              </strong>
-              <p className="metric-copy">
-                Harder substitution and pricier maritime insurance.
-              </p>
-            </article>
-            <article className="metric-card">
-              <span className="metric-label">Detour load</span>
-              <strong className="metric-value">
-                {scenario.summary.detourMiles.toLocaleString()} nm
-              </strong>
-              <p className="metric-copy">
-                Additional route distance driven by closures and rerouting.
-              </p>
+            <article className="dispatch-card">
+              <p className="eyebrow">System signal</p>
+              <div className="mt-4 grid gap-3">
+                <div className="signal-row">
+                  <span className="signal-row-label">Stress posture</span>
+                  <strong className="signal-row-value">
+                    {scenario.summary.systemicStress}
+                  </strong>
+                </div>
+                <div className="signal-row">
+                  <span className="signal-row-label">Fuel shock</span>
+                  <strong className="signal-row-value">
+                    {scenario.summary.fuelPressure}/100
+                  </strong>
+                </div>
+                <div className="signal-row">
+                  <span className="signal-row-label">Detour load</span>
+                  <strong className="signal-row-value">
+                    {scenario.summary.detourMiles.toLocaleString()} nm
+                  </strong>
+                </div>
+              </div>
             </article>
           </div>
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)_330px]">
+      <section className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_340px]">
         <ConflictPanel
           aggressorId={aggressorId}
           defenderId={defenderId}
@@ -88,7 +94,7 @@ function SimulatorPage() {
         <ImpactSidebar topCountries={scenario.topAffected} />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+      <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <ChannelPressureGrid channelPressure={scenario.channelPressure} />
         <ChokepointWatch blockedChokepointIds={blockedChokepointIds} />
       </section>

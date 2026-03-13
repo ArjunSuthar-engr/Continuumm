@@ -9,7 +9,7 @@ import {
 function MethodologyPage() {
   return (
     <div className="space-y-6">
-      <section className="hero-shell px-5 py-8 sm:px-6 lg:px-8">
+      <section className="hero-shell hero-dossier px-5 py-8 sm:px-6 lg:px-8">
         <p className="eyebrow">Methodology</p>
         <h1 className="mt-4 max-w-4xl text-5xl leading-none text-stone-100 sm:text-6xl">
           Explain the mechanism, the inputs, and the limits before the user trusts

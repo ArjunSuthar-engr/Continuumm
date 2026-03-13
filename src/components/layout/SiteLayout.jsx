@@ -15,20 +15,30 @@ function SiteLayout() {
   return (
     <div className="min-h-screen px-4 py-4 sm:px-6 lg:px-10">
       <div className="site-shell mx-auto flex min-h-[calc(100vh-2rem)] w-full max-w-[1600px] flex-col gap-6 p-4 xl:p-6">
-        <header className="site-header px-5 py-4 sm:px-6">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <header className="site-header px-5 py-5 sm:px-6">
+          <div className="site-header-top">
             <div className="flex items-center gap-4">
               <div className="site-brand-mark">
                 C
               </div>
               <div>
-                <p className="eyebrow">Continuumm</p>
+                <p className="eyebrow">Continuumm Command Network</p>
                 <p className="mt-1 text-sm text-slate-300">
                   Geopolitical spillover simulator
                 </p>
               </div>
             </div>
+            <div className="status-rail">
+              <span className="signal-pill">
+                <span className="signal-dot" />
+                Structural model live
+              </span>
+              <span className="signal-pill">Prototype phase</span>
+              <span className="signal-pill">Dark default theater</span>
+            </div>
+          </div>
 
+          <div className="site-header-bottom">
             <nav className="flex flex-wrap gap-2">
               {navItems.map((item) => (
                 <NavLink
@@ -43,7 +53,6 @@ function SiteLayout() {
                 </NavLink>
               ))}
             </nav>
-
             <div className="flex flex-wrap items-center gap-2 self-start xl:self-auto">
               <button type="button" className="theme-toggle" onClick={toggleTheme}>
                 <span className="theme-toggle-label">Theme</span>
@@ -62,12 +71,12 @@ function SiteLayout() {
           <Outlet />
         </main>
 
-        <footer className="site-footer px-5 py-5 sm:px-6">
+        <footer className="site-footer px-5 py-6 sm:px-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <p className="eyebrow">Build posture</p>
               <h2 className="mt-3 text-2xl text-stone-100">
-                Structural, visual, and openly documented.
+                Operations-first visual system, openly documented.
               </h2>
               <p className="mt-3 text-sm leading-6 text-slate-300">
                 Continuumm is being built as a product website first, then expanded

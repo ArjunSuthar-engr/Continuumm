@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-009',
+    date: '2026-03-13',
+    label: 'UI direction',
+    title: 'Reframed Continuumm as an operations-theater interface',
+    summary:
+      'The visual system was rebuilt around a Dunkirk-inspired command-table language with stronger theater hierarchy, dispatch-style briefing blocks, and a less generic dashboard posture across core pages.',
+    items: [
+      'Redesigned the shared shell and navigation into a command-console structure with status rail signals.',
+      'Reworked Home and Simulator hero sections into theater briefing surfaces with dispatch cards and mission strips.',
+      'Retuned the global CSS token system, motion cadence, and panel geometry to make the product feel more cinematic and less SaaS-like.',
+    ],
+    review:
+      'Check the Home and Simulator pages in both themes and confirm whether this new direction should be locked as the visual baseline.',
+  },
+  {
     id: 'log-008',
     date: '2026-03-13',
     label: 'Theme',
