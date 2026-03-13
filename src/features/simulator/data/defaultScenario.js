@@ -1,7 +1,7 @@
 export const defaultScenarioConfig = {
-  aggressorId: 'china',
-  defenderId: 'united-states',
-  focusModeId: 'balanced',
-  intensity: 68,
-  blockedChokepointIds: ['hormuz', 'malacca'],
+  aggressorId: 'israel',
+  defenderId: 'iran',
+  focusModeId: 'energy',
+  intensity: 76,
+  blockedChokepointIds: ['hormuz', 'bab-el-mandeb', 'suez'],
 }

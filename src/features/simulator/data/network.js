@@ -38,6 +38,7 @@ export const chokepoints = [
       germany: 4,
       india: 10,
       iran: 5,
+      israel: 4,
       japan: 9,
       'saudi-arabia': 4,
       singapore: 6,
@@ -58,6 +59,7 @@ export const chokepoints = [
       egypt: 10,
       germany: 9,
       india: 5,
+      israel: 8,
       japan: 5,
       russia: 3,
       'saudi-arabia': 6,
@@ -77,6 +79,7 @@ export const chokepoints = [
       china: 10,
       germany: 4,
       india: 7,
+      israel: 2,
       japan: 8,
       'saudi-arabia': 5,
       singapore: 10,
@@ -112,6 +115,7 @@ export const chokepoints = [
       egypt: 8,
       germany: 6,
       india: 6,
+      israel: 6,
       japan: 5,
       'saudi-arabia': 7,
       singapore: 5,
@@ -132,6 +136,7 @@ export const countries = [
       china: 18,
       germany: 10,
       india: 6,
+      israel: 5,
       japan: 8,
       'south-korea': 7,
       turkey: 3,
@@ -145,6 +150,7 @@ export const countries = [
       china: 5,
       germany: 8,
       india: 6,
+      israel: 9,
       japan: 9,
       russia: 6,
       'south-korea': 9,
@@ -238,6 +244,7 @@ export const countries = [
     tradeLinks: {
       china: 13,
       india: 5,
+      israel: 4,
       japan: 5,
       russia: 7,
       turkey: 6,
@@ -250,6 +257,7 @@ export const countries = [
     },
     strategicLinks: {
       china: 5,
+      israel: 4,
       russia: 4,
       turkey: 5,
       'united-states': 8,
@@ -274,6 +282,7 @@ export const countries = [
     tradeLinks: {
       china: 8,
       germany: 5,
+      israel: 3,
       japan: 6,
       singapore: 7,
       'united-states': 6,
@@ -285,6 +294,7 @@ export const countries = [
     },
     strategicLinks: {
       china: 5,
+      israel: 5,
       russia: 4,
       'united-states': 6,
     },
@@ -308,6 +318,7 @@ export const countries = [
     tradeLinks: {
       china: 11,
       germany: 5,
+      israel: 2,
       singapore: 7,
       'south-korea': 9,
       'united-states': 8,
@@ -319,6 +330,7 @@ export const countries = [
     },
     strategicLinks: {
       china: 6,
+      israel: 3,
       'south-korea': 6,
       'united-states': 9,
     },
@@ -384,6 +396,7 @@ export const countries = [
     strategicLinks: {
       egypt: 5,
       iran: 8,
+      israel: 4,
       turkey: 4,
       'united-states': 6,
     },
@@ -417,6 +430,7 @@ export const countries = [
       'south-korea': 5,
     },
     strategicLinks: {
+      israel: 9,
       russia: 6,
       'saudi-arabia': 8,
       turkey: 4,
@@ -428,6 +442,39 @@ export const countries = [
     signature: 'Gulf escalation risk and sanctions-sensitive energy flows.',
   },
   {
+    id: 'israel',
+    code: 'IL',
+    name: 'Israel',
+    region: 'Middle East',
+    position: { x: 56, y: 36 },
+    resilience: 67,
+    shippingSensitivity: 33,
+    tradeLinks: {
+      germany: 4,
+      india: 3,
+      turkey: 2,
+      'united-states': 5,
+    },
+    energyLinks: {
+      'saudi-arabia': 2,
+      'united-states': 1,
+    },
+    strategicLinks: {
+      egypt: 6,
+      india: 5,
+      iran: 9,
+      'saudi-arabia': 4,
+      turkey: 5,
+      'united-states': 9,
+    },
+    chokepointExposure: {
+      'bab-el-mandeb': 6,
+      hormuz: 4,
+      suez: 8,
+    },
+    signature: 'Eastern Mediterranean security posture and Gulf escalation sensitivity.',
+  },
+  {
     id: 'turkey',
     code: 'TR',
     name: 'Turkey',
@@ -437,6 +484,7 @@ export const countries = [
     shippingSensitivity: 39,
     tradeLinks: {
       germany: 6,
+      israel: 2,
       russia: 7,
       'united-states': 3,
     },
@@ -446,6 +494,7 @@ export const countries = [
     },
     strategicLinks: {
       egypt: 5,
+      israel: 5,
       russia: 5,
       'saudi-arabia': 4,
       'united-states': 6,
@@ -474,6 +523,7 @@ export const countries = [
       'saudi-arabia': 4,
     },
     strategicLinks: {
+      israel: 6,
       'saudi-arabia': 5,
       turkey: 5,
       'united-states': 4,
@@ -496,6 +546,7 @@ export const countries = [
     tradeLinks: {
       china: 9,
       india: 7,
+      israel: 2,
       japan: 7,
       'south-korea': 6,
       'united-states': 5,

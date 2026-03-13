@@ -51,6 +51,7 @@ export function simulateConflict({
   focusModeId,
   intensity,
   blockedChokepointIds,
+  liveSignals,
 }) {
   const aggressor = countriesById[aggressorId]
   const defender = countriesById[defenderId]
@@ -59,7 +60,36 @@ export function simulateConflict({
   const blockedChokepoints = blockedChokepointIds
     .map((id) => chokepointsById[id])
     .filter(Boolean)
-  const intensityFactor = intensity / 100
+  const liveMetrics = liveSignals?.metrics ?? null
+  const baseIntensityFactor = intensity / 100
+  const liveIntensityFactor = liveMetrics
+    ? clamp(
+        (intensity +
+          Math.round(
+            liveMetrics.conflictHeat * 0.14 +
+              liveMetrics.oilStress * 0.18 +
+              liveMetrics.shippingStress * 0.1 -
+              20,
+          )) /
+          100,
+        0.25,
+        1.24,
+      )
+    : baseIntensityFactor
+
+  const liveChannelMultipliers = liveMetrics
+    ? {
+        trade: 1 + liveMetrics.tradeStress / 440,
+        energy: 1 + liveMetrics.oilStress / 360,
+        shipping: 1 + liveMetrics.shippingStress / 380,
+        strategic: 1 + liveMetrics.conflictHeat / 460,
+      }
+    : {
+        trade: 1,
+        energy: 1,
+        shipping: 1,
+        strategic: 1,
+      }
 
   const results = countries
     .filter((country) => country.id !== aggressorId && country.id !== defenderId)
@@ -91,21 +121,55 @@ export function simulateConflict({
         ([aggressor.region, defender.region].includes(country.region) ? 7 : 0)
 
       const channelScores = {
-        trade: tradeExposure * focusMode.weights.trade,
+        trade:
+          tradeExposure * focusMode.weights.trade * liveChannelMultipliers.trade,
         energy:
           (directEnergyExposure + chokepointEnergyExposure) *
-          focusMode.weights.energy,
-        shipping: shippingExposure * focusMode.weights.shipping,
-        strategic: strategicExposure * focusMode.weights.strategic,
+          focusMode.weights.energy *
+          liveChannelMultipliers.energy,
+        shipping:
+          shippingExposure *
+          focusMode.weights.shipping *
+          liveChannelMultipliers.shipping,
+        strategic:
+          strategicExposure *
+          focusMode.weights.strategic *
+          liveChannelMultipliers.strategic,
       }
 
       const rawScore = Object.values(channelScores).reduce(
         (sum, value) => sum + value,
         0,
       )
+      const indiaConnectivity =
+        country.id === 'india'
+          ? 1
+          : clamp(
+              ((country.tradeLinks.india ?? 0) + (country.energyLinks.india ?? 0)) /
+                18,
+              0,
+              1,
+            )
+      const gulfDependency = clamp(
+        ((country.chokepointExposure.hormuz ?? 0) + (country.energyLinks.iran ?? 0)) /
+          18,
+        0,
+        1.2,
+      )
+      const liveCountryModifier = liveMetrics
+        ? 1 +
+          clamp(
+            (liveMetrics.indiaExposure / 100) * 0.14 * indiaConnectivity +
+              (liveMetrics.oilStress / 100) * 0.1 * gulfDependency,
+            0,
+            0.35,
+          )
+        : 1
       const resilienceModifier = 1 - country.resilience / 220
       const totalScore = clamp(
-        Math.round(rawScore * intensityFactor * resilienceModifier),
+        Math.round(
+          rawScore * liveIntensityFactor * resilienceModifier * liveCountryModifier,
+        ),
         8,
         96,
       )
@@ -173,10 +237,17 @@ export function simulateConflict({
   const summary = {
     averageScore: Math.round(averageScore),
     detourMiles: Math.round(
-      blockedChokepoints.length * 1400 + totalPressure * 65 + intensity * 14,
+      blockedChokepoints.length * 1400 +
+        totalPressure * 65 +
+        intensity * 14 +
+        (liveMetrics?.shippingStress ?? 0) * 24,
     ),
     fuelPressure: clamp(
-      Math.round(channelPressure.energy * 1.2 + totalPressure * 0.65),
+      Math.round(
+        channelPressure.energy * 1.2 +
+          totalPressure * 0.65 +
+          (liveMetrics?.oilStress ?? 0) * 0.38,
+      ),
       12,
       98,
     ),
@@ -186,6 +257,15 @@ export function simulateConflict({
         : topScore >= 52
           ? 'Spreading'
           : 'Contained',
+    liveOverlay: liveMetrics
+      ? {
+          sourceHealth: liveSignals?.sourceHealth ?? 'fallback',
+          conflictHeat: liveMetrics.conflictHeat,
+          oilStress: liveMetrics.oilStress,
+          shippingStress: liveMetrics.shippingStress,
+          indiaExposure: liveMetrics.indiaExposure,
+        }
+      : null,
   }
 
   return {

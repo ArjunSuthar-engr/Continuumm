@@ -20,6 +20,19 @@ shipping routes, and strategic chokepoints.
 - `/documentation`
 - `/about`
 
+## Live Data Overlay (Simulator)
+
+The simulator includes an optional live overlay that ingests open-source
+signals and applies capped pressure multipliers on top of the structural model.
+
+Current sources:
+
+- GDELT DOC API (conflict, shipping, trade, and India-focused news-volume trends)
+- U.S. EIA API (Brent spot reference, with `VITE_EIA_API_KEY`, default `DEMO_KEY`)
+
+If those APIs fail or are blocked, Continuumm automatically falls back to the
+seed structural model.
+
 ## Local Development
 
 ```powershell
@@ -48,7 +61,7 @@ Local setup flow:
 
 1. Copy `.firebaserc.example` to `.firebaserc`
 2. The Firebase project ID is `continuumm`
-3. Fill `.env` using `.env.example`
+3. Fill `.env` using `.env.example` (`VITE_EIA_API_KEY` is optional)
 
 Both `.firebaserc` and `.env` stay local-only until you decide the official
 project binding is ready to be tracked differently.

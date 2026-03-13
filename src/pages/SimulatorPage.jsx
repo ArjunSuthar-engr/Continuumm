@@ -3,6 +3,7 @@ import {
   ChokepointWatch,
   ConflictPanel,
   ImpactSidebar,
+  LiveIntelPanel,
   RippleBoard,
   useConflictScenario,
 } from '../features/simulator'
@@ -15,11 +16,27 @@ function SimulatorPage() {
     intensity,
     blockedChokepointIds,
     scenario,
+    presets,
+    activePresetId,
+    liveSignals,
+    liveStatus,
+    liveError,
+    liveOverlayEnabled,
     handleCountryChange,
     setIntensity,
     setFocusModeId,
     toggleChokepoint,
+    setLiveOverlayEnabled,
+    refreshLiveSignals,
+    applyPreset,
+    applyLiveSuggestions,
   } = useConflictScenario()
+  const activePreset =
+    presets.find((preset) => preset.id === activePresetId) ?? presets[0]
+  const liveContextActorIds = activePreset?.contextActorIds ?? [
+    'united-states',
+    'india',
+  ]
 
   return (
     <div className="space-y-6">
@@ -69,6 +86,14 @@ function SimulatorPage() {
                     {scenario.summary.detourMiles.toLocaleString()} nm
                   </strong>
                 </div>
+                <div className="signal-row">
+                  <span className="signal-row-label">Live overlay</span>
+                  <strong className="signal-row-value">
+                    {liveOverlayEnabled
+                      ? scenario.summary.liveOverlay?.sourceHealth ?? 'syncing'
+                      : 'disabled'}
+                  </strong>
+                </div>
               </div>
             </article>
           </div>
@@ -76,17 +101,35 @@ function SimulatorPage() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)_340px]">
-        <ConflictPanel
-          aggressorId={aggressorId}
-          defenderId={defenderId}
-          focusModeId={focusModeId}
-          intensity={intensity}
-          blockedChokepointIds={blockedChokepointIds}
-          onCountryChange={handleCountryChange}
-          onIntensityChange={setIntensity}
-          onFocusModeChange={setFocusModeId}
-          onToggleChokepoint={toggleChokepoint}
-        />
+        <div className="space-y-6">
+          <LiveIntelPanel
+            presets={presets}
+            activePresetId={activePresetId}
+            onApplyPreset={applyPreset}
+            liveSignals={liveSignals}
+            liveStatus={liveStatus}
+            liveError={liveError}
+            liveOverlayEnabled={liveOverlayEnabled}
+            onLiveOverlayToggle={setLiveOverlayEnabled}
+            onRefreshSignals={() =>
+              refreshLiveSignals({
+                contextActorIds: liveContextActorIds,
+              })
+            }
+            onApplySuggestions={applyLiveSuggestions}
+          />
+          <ConflictPanel
+            aggressorId={aggressorId}
+            defenderId={defenderId}
+            focusModeId={focusModeId}
+            intensity={intensity}
+            blockedChokepointIds={blockedChokepointIds}
+            onCountryChange={handleCountryChange}
+            onIntensityChange={setIntensity}
+            onFocusModeChange={setFocusModeId}
+            onToggleChokepoint={toggleChokepoint}
+          />
+        </div>
         <RippleBoard
           scenario={scenario}
           blockedChokepointIds={blockedChokepointIds}

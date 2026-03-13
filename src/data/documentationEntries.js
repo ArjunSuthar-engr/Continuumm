@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-010',
+    date: '2026-03-13',
+    label: 'Live simulator',
+    title: 'Added an API-driven live intelligence overlay to the simulator',
+    summary:
+      'The simulator now supports a live telemetry layer using open-source data feeds, including a US-Israel-Iran escalation preset and capped real-time signal multipliers applied to structural spillover scoring.',
+    items: [
+      'Added a dedicated live-intel panel with refresh/apply controls, source-health status, and an overlay toggle.',
+      'Integrated GDELT trend signals and EIA Brent references into a resilient fetch pipeline with fallback behavior.',
+      'Extended the country graph with Israel and added a scenario preset centered on US-Israel-Iran escalation context.',
+    ],
+    review:
+      'Run the simulator preset, refresh live signals, and verify whether the resulting India and third-country pressure shifts feel plausible.',
+  },
+  {
     id: 'log-009',
     date: '2026-03-13',
     label: 'UI direction',
