@@ -186,18 +186,31 @@ export function buildCountryEffects({
     primary.energyImportScore * profile.fuelPassThrough.value
   const freightScore =
     primary.shippingRouteScore * profile.freightPassThrough.value
+  const macroAmplifier = 1 + profile.currencyPassThrough.value * 0.28
+  const policyDampener = clamp(
+    1 -
+      profile.policyBufferScore.value * 0.18 -
+      profile.strategicReserveDays.value / 1200,
+    0.72,
+    1.03,
+  )
   const inflationScore =
     (fuelRetailScore * 0.58 + freightScore * 0.42) *
     profile.inflationSensitivity.value *
-    1.55
+    1.55 *
+    macroAmplifier *
+    policyDampener
   const manufacturingScore =
     (primary.shippingRouteScore * 0.56 + primary.energyImportScore * 0.44) *
-    profile.manufacturingSensitivity.value
+    profile.manufacturingSensitivity.value *
+    (1 + profile.currencyPassThrough.value * 0.16) *
+    (1 - profile.policyBufferScore.value * 0.08)
   const electricityScore =
     primary.energyImportScore *
     (profile.gasPowerSharePct.value / 100) *
     profile.electricityPassThrough.value *
-    2.1
+    2.1 *
+    (1 - profile.policyBufferScore.value * 0.12)
 
   const primaryEffects = [
     buildEffectItem({
@@ -256,10 +269,12 @@ export function buildCountryEffects({
       basis: combineBasisTag([
         primary.routeBasis,
         profile.inflationSensitivity.basis,
+        profile.currencyPassThrough.basis,
+        profile.policyBufferScore.basis,
       ]),
-      source: `${profile.inflationSensitivity.source} | ${primary.routeSource}`,
+      source: `${profile.inflationSensitivity.source} | ${profile.currencyPassThrough.source} | ${profile.policyBufferScore.source} | ${profile.strategicReserveDays.source} | ${primary.routeSource}`,
       summary:
-        'Fuel and freight pass-through pushes broad CPI pressure after transport and input lags.',
+        `Fuel and freight pass-through pushes CPI pressure after transport/input lags; policy buffer ${Math.round(profile.policyBufferScore.value * 100)}/100 and reserve cover ${profile.strategicReserveDays.value} days partially absorb shock.`,
     }),
     buildEffectItem({
       id: 'secondary-manufacturing',

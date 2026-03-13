@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-030',
+    date: '2026-03-14',
+    label: 'Data coverage upgrade',
+    title: 'Expanded route coverage and added pipeline/LNG/port realism factors',
+    summary:
+      'The simulator data layer now covers route dependence beyond Hormuz and applies country-level pipeline bypass, LNG exposure, and port concentration factors to effect scoring.',
+    items: [
+      'Expanded observed-inferred route dependence entries for Suez, Bab el-Mandeb, Malacca, and Bosporus across additional countries.',
+      'Added country route augmenters (pipeline bypass %, LNG import exposure %, port concentration score) and wired them into chokepoint effect scoring.',
+      'Extended secondary-effect modelling with macro coefficients (currency pass-through, policy buffer, strategic reserve days) and added regression tests for data coverage and metadata.',
+    ],
+    review:
+      'Validate non-Hormuz scenarios and confirm selected-point details now show raw route share, bypass, LNG, and port factors with sensible effect shifts.',
+  },
+  {
     id: 'log-029',
     date: '2026-03-14',
     label: 'Secondary effects engine',

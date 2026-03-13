@@ -20,8 +20,10 @@ export {
 export { chokepoints, countries, focusModes } from './data/network.js'
 export { defaultPresetId, scenarioPresets } from './data/scenarioPresets.js'
 export {
+  getChokepointModalProfile,
   getConflictChokepointControl,
   getConflictControlMap,
+  getCountryRouteAugmenters,
   getCountryRouteDependence,
   routeDataSnapshot,
 } from './data/routeReality.js'

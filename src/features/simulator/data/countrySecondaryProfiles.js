@@ -40,6 +40,22 @@ const secondaryProfiles = {
       basis: 'observed-inferred',
       source: 'World Bank CPI structure proxy with India energy-food exposure.',
     },
+    currencyPassThrough: {
+      value: 0.42,
+      basis: 'observed-inferred',
+      source: 'FX import-pass-through proxy from macro inflation transmission.',
+    },
+    policyBufferScore: {
+      value: 0.55,
+      basis: 'modelled',
+      source:
+        'Continuumm policy-buffer estimate from fiscal space and energy interventions.',
+    },
+    strategicReserveDays: {
+      value: 74,
+      basis: 'observed-inferred',
+      source: 'Strategic and commercial stock cover proxy (days of net imports).',
+    },
     manufacturingSensitivity: {
       value: 0.64,
       basis: 'modelled',
@@ -73,6 +89,22 @@ const secondaryProfiles = {
       basis: 'observed-inferred',
       source: 'CPI basket and administered-price dampening proxy.',
     },
+    currencyPassThrough: {
+      value: 0.29,
+      basis: 'observed-inferred',
+      source: 'FX pass-through proxy moderated by managed pricing channels.',
+    },
+    policyBufferScore: {
+      value: 0.68,
+      basis: 'modelled',
+      source:
+        'Continuumm policy-buffer estimate from fiscal and administrative controls.',
+    },
+    strategicReserveDays: {
+      value: 85,
+      basis: 'observed-inferred',
+      source: 'Strategic/commercial stock cover proxy.',
+    },
     manufacturingSensitivity: {
       value: 0.78,
       basis: 'observed-inferred',
@@ -105,6 +137,21 @@ const secondaryProfiles = {
       basis: 'observed-inferred',
       source: 'Macro proxy from CPI structure and currency import channel.',
     },
+    currencyPassThrough: {
+      value: 0.46,
+      basis: 'observed-inferred',
+      source: 'Import-currency transmission proxy for energy-intensive imports.',
+    },
+    policyBufferScore: {
+      value: 0.62,
+      basis: 'modelled',
+      source: 'Continuumm policy-buffer estimate from tariff/fiscal cushioning.',
+    },
+    strategicReserveDays: {
+      value: 160,
+      basis: 'observed-inferred',
+      source: 'Strategic stock-cover proxy for Japan.',
+    },
     manufacturingSensitivity: {
       value: 0.7,
       basis: 'observed-inferred',
@@ -136,6 +183,21 @@ const secondaryProfiles = {
       value: 0.29,
       basis: 'observed-inferred',
       source: 'Macro sensitivity proxy from CPI and import intensity.',
+    },
+    currencyPassThrough: {
+      value: 0.41,
+      basis: 'observed-inferred',
+      source: 'FX import-cost transmission proxy for South Korea.',
+    },
+    policyBufferScore: {
+      value: 0.59,
+      basis: 'modelled',
+      source: 'Continuumm policy-buffer estimate for tax/tariff smoothing capacity.',
+    },
+    strategicReserveDays: {
+      value: 96,
+      basis: 'observed-inferred',
+      source: 'Strategic stock-cover proxy for Korea.',
     },
     manufacturingSensitivity: {
       value: 0.75,
@@ -178,6 +240,21 @@ function fallbackProfile(countryId) {
       value: clamp(0.22 + shippingSensitivity * 0.14, 0.2, 0.42),
       basis: 'modelled',
       source: 'Continuumm fallback macro sensitivity model.',
+    },
+    currencyPassThrough: {
+      value: clamp(0.3 + shippingSensitivity * 0.18, 0.28, 0.56),
+      basis: 'modelled',
+      source: 'Continuumm fallback FX pass-through model.',
+    },
+    policyBufferScore: {
+      value: clamp(Number((0.5 + shippingSensitivity * 0.12).toFixed(2)), 0.48, 0.72),
+      basis: 'modelled',
+      source: 'Continuumm fallback policy-buffer model.',
+    },
+    strategicReserveDays: {
+      value: clamp(Math.round(62 + (country?.resilience ?? 55) * 0.9), 45, 140),
+      basis: 'modelled',
+      source: 'Continuumm fallback strategic stock-cover model.',
     },
     manufacturingSensitivity: {
       value: clamp(0.55 + shippingSensitivity * 0.2, 0.48, 0.86),

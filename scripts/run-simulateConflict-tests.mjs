@@ -2,6 +2,11 @@ import assert from 'node:assert/strict'
 import { buildCountryEffects } from '../src/features/simulator/lib/buildCountryEffects.js'
 import { buildEffectPoints } from '../src/features/simulator/lib/buildEffectPoints.js'
 import { deriveConflictChokepoints } from '../src/features/simulator/lib/deriveConflictChokepoints.js'
+import { getCountrySecondaryProfile } from '../src/features/simulator/data/countrySecondaryProfiles.js'
+import {
+  getCountryRouteAugmenters,
+  getCountryRouteDependence,
+} from '../src/features/simulator/data/routeReality.js'
 import { simulateConflict } from '../src/features/simulator/lib/simulateConflict.js'
 
 function runTest(name, testFn) {
@@ -256,6 +261,64 @@ runTest('india electricity effect remains lower than retail fuel effect under ho
   assert.equal(Boolean(fuel), true)
   assert.equal(Boolean(power), true)
   assert.equal(fuel.score > power.score, true)
+})
+
+runTest('route dependence coverage includes observed-inferred entries beyond hormuz', () => {
+  const indiaSuez = getCountryRouteDependence('india', 'suez')
+  const chinaMalacca = getCountryRouteDependence('china', 'malacca')
+
+  assert.equal(indiaSuez.sharePct > 0, true)
+  assert.equal(chinaMalacca.sharePct > 0, true)
+  assert.equal(
+    ['observed', 'observed-inferred'].includes(indiaSuez.basis),
+    true,
+  )
+  assert.equal(
+    ['observed', 'observed-inferred'].includes(chinaMalacca.basis),
+    true,
+  )
+})
+
+runTest('country route augmenters and macro coefficients are present for secondary modelling', () => {
+  const augmenters = getCountryRouteAugmenters('india')
+  const profile = getCountrySecondaryProfile('india')
+
+  assert.equal(augmenters.pipelineBypassPct.value > 0, true)
+  assert.equal(augmenters.lngImportExposurePct.value > 0, true)
+  assert.equal(augmenters.portConcentrationScore.value > 0, true)
+
+  assert.equal(profile.fuelPassThrough.value > 0, true)
+  assert.equal(profile.inflationSensitivity.value > 0, true)
+  assert.equal(profile.currencyPassThrough.value > 0, true)
+  assert.equal(profile.policyBufferScore.value > 0, true)
+})
+
+runTest('effect-point metadata includes route augmenter fields', () => {
+  const blockedChokepointIds = deriveConflictChokepoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+  })
+  const effectPoints = buildEffectPoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    selectedCountryId: 'india',
+    blockedChokepointIds,
+  })
+
+  assert.equal(effectPoints.length > 0, true)
+  const point = effectPoints[0]
+
+  assert.equal(typeof point.routeShareRawPct, 'number')
+  assert.equal(typeof point.pipelineBypassPct, 'number')
+  assert.equal(typeof point.lngImportExposurePct, 'number')
+  assert.equal(typeof point.portConcentrationScore, 'number')
+  assert.equal(point.routeShareRawPct >= point.modelledImportShare, true)
 })
 
 console.log('All simulator checks passed.')

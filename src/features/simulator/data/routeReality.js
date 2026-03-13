@@ -7,7 +7,7 @@ import {
 export const routeDataSnapshot = {
   asOf: '2026-03-14',
   summary:
-    'Observed oil-route inputs are blended with explicit model assumptions where country-level route shares are not published directly.',
+    'Observed route inputs are blended with explicit model assumptions where country-level route shares are not published directly.',
   sources: [
     {
       id: 'eia-chokepoints-2025',
@@ -35,6 +35,21 @@ export const routeDataSnapshot = {
         "Columbia CGEP summary of China's 2025 customs-based Middle East crude intake",
       url: 'https://www.energypolicy.columbia.edu/implications-of-the-conflict-in-the-middle-east-for-chinas-energy-security/',
     },
+    {
+      id: 'unctad-maritime-2025',
+      label: 'UNCTAD maritime transport review and route-risk commentary',
+      url: 'https://unctad.org/publication/review-maritime-transport',
+    },
+    {
+      id: 'worldbank-logistics-2023',
+      label: 'World Bank logistics and trade facilitation indicators',
+      url: 'https://lpi.worldbank.org/',
+    },
+    {
+      id: 'iea-gas-2025',
+      label: 'IEA Gas market and LNG trade flow context',
+      url: 'https://www.iea.org/reports/gas-market-report-q2-2025',
+    },
   ],
 }
 
@@ -54,6 +69,24 @@ const observedRouteDependence = {
       source:
         'EIA India brief: Middle East share 45% (2023), converted with Hormuz transit factor 0.82.',
     },
+    suez: {
+      sharePct: 14,
+      basis: 'observed-inferred',
+      source:
+        'UNCTAD Europe-India route mix proxy mapped to Suez transit dependence.',
+    },
+    'bab-el-mandeb': {
+      sharePct: 17,
+      basis: 'observed-inferred',
+      source:
+        'Red Sea transit share inferred from India-Europe and Mediterranean cargo mix.',
+    },
+    malacca: {
+      sharePct: 26,
+      basis: 'observed-inferred',
+      source:
+        'Eastbound crude/product and container routing proxy via Strait of Malacca.',
+    },
   },
   china: {
     hormuz: {
@@ -61,6 +94,24 @@ const observedRouteDependence = {
       basis: 'observed-inferred',
       source:
         'CGEP 2025 summary: Middle East share about 54% (GAC + Kpler), converted with Hormuz transit factor 0.74.',
+    },
+    malacca: {
+      sharePct: 61,
+      basis: 'observed-inferred',
+      source:
+        'Eastbound maritime throughput proxy for Malacca in China-bound seaborne imports.',
+    },
+    suez: {
+      sharePct: 9,
+      basis: 'observed-inferred',
+      source:
+        'Europe-China route split proxy mapped to Suez chokepoint share.',
+    },
+    'bab-el-mandeb': {
+      sharePct: 12,
+      basis: 'observed-inferred',
+      source:
+        'Red Sea corridor proxy for China-bound westward routes via Suez.',
     },
   },
   japan: {
@@ -70,6 +121,17 @@ const observedRouteDependence = {
       source:
         'EIA Japan brief: Middle East share 93% (2022), converted with Hormuz transit factor 0.82.',
     },
+    malacca: {
+      sharePct: 64,
+      basis: 'observed-inferred',
+      source:
+        'Japan-bound tanker route mix proxy for Malacca and adjacent lanes.',
+    },
+    'bab-el-mandeb': {
+      sharePct: 8,
+      basis: 'observed-inferred',
+      source: 'Middle East-Europe-East Asia long-route proxy for Bab el-Mandeb.',
+    },
   },
   'south-korea': {
     hormuz: {
@@ -77,6 +139,59 @@ const observedRouteDependence = {
       basis: 'observed-inferred',
       source:
         'KNOC 2023 data via Yonhap: Middle East share 71.9%, converted with Hormuz transit factor 0.81.',
+    },
+    malacca: {
+      sharePct: 62,
+      basis: 'observed-inferred',
+      source:
+        'Korea-bound seaborne imports route share proxy through Malacca.',
+    },
+    suez: {
+      sharePct: 7,
+      basis: 'observed-inferred',
+      source: 'Europe-Korea route mix proxy via Suez corridor.',
+    },
+  },
+  germany: {
+    suez: {
+      sharePct: 18,
+      basis: 'observed-inferred',
+      source:
+        'Germany-Asia cargo route proxy using Suez-dominant Europe-Asia corridor.',
+    },
+    'bab-el-mandeb': {
+      sharePct: 10,
+      basis: 'observed-inferred',
+      source:
+        'Red Sea segment share inferred from Suez-linked Europe-Asia shipments.',
+    },
+    bosporus: {
+      sharePct: 6,
+      basis: 'observed-inferred',
+      source:
+        'Black Sea import corridor proxy for Bosporus dependency into Europe.',
+    },
+  },
+  turkey: {
+    bosporus: {
+      sharePct: 23,
+      basis: 'observed-inferred',
+      source:
+        'Black Sea maritime dependence inferred from Turkish Straits transit profile.',
+    },
+    suez: {
+      sharePct: 11,
+      basis: 'observed-inferred',
+      source:
+        'Mediterranean-Red Sea linkage proxy for Turkish route exposure.',
+    },
+  },
+  singapore: {
+    malacca: {
+      sharePct: 68,
+      basis: 'observed-inferred',
+      source:
+        'Transshipment and bunkering concentration around Malacca-Singapore corridor.',
     },
   },
   'united-states': {
@@ -86,6 +201,166 @@ const observedRouteDependence = {
       source:
         'EIA Today in Energy (Jun 2025): 7% of U.S. crude and condensate imports moved through Hormuz in 1Q25.',
     },
+  },
+}
+
+const countryRouteAugmenters = {
+  india: {
+    pipelineBypassPct: {
+      value: 14,
+      basis: 'observed-inferred',
+      source:
+        'Pipeline bypass capacity proxy for import blend and inland distribution.',
+    },
+    lngImportExposurePct: {
+      value: 11,
+      basis: 'observed-inferred',
+      source: 'IEA LNG share proxy for India gas import balance.',
+    },
+    portConcentrationScore: {
+      value: 0.58,
+      basis: 'modelled',
+      source:
+        'Continuumm concentration score from major-port throughput distribution.',
+    },
+  },
+  china: {
+    pipelineBypassPct: {
+      value: 26,
+      basis: 'observed-inferred',
+      source:
+        'Pipeline import corridor share proxy (Russia/Central Asia) reducing seaborne reliance.',
+    },
+    lngImportExposurePct: {
+      value: 9,
+      basis: 'observed-inferred',
+      source: 'IEA LNG share proxy for China gas import profile.',
+    },
+    portConcentrationScore: {
+      value: 0.49,
+      basis: 'modelled',
+      source: 'Continuumm concentration score from major Chinese port network.',
+    },
+  },
+  japan: {
+    pipelineBypassPct: {
+      value: 4,
+      basis: 'observed',
+      source: 'Island system with negligible cross-border pipeline bypass.',
+    },
+    lngImportExposurePct: {
+      value: 36,
+      basis: 'observed-inferred',
+      source: 'IEA LNG import intensity proxy for Japan.',
+    },
+    portConcentrationScore: {
+      value: 0.71,
+      basis: 'modelled',
+      source: 'Continuumm port concentration estimate for energy gateways.',
+    },
+  },
+  'south-korea': {
+    pipelineBypassPct: {
+      value: 3,
+      basis: 'observed',
+      source: 'Limited cross-border pipeline bypass for seaborne imports.',
+    },
+    lngImportExposurePct: {
+      value: 33,
+      basis: 'observed-inferred',
+      source: 'IEA LNG reliance proxy for South Korea.',
+    },
+    portConcentrationScore: {
+      value: 0.66,
+      basis: 'modelled',
+      source: 'Continuumm port concentration estimate for Korean gateways.',
+    },
+  },
+  germany: {
+    pipelineBypassPct: {
+      value: 32,
+      basis: 'observed-inferred',
+      source: 'Pipeline and inland corridor proxy reducing seaborne dependence.',
+    },
+    lngImportExposurePct: {
+      value: 18,
+      basis: 'observed-inferred',
+      source: 'IEA/EU LNG intake proxy for Germany import profile.',
+    },
+    portConcentrationScore: {
+      value: 0.45,
+      basis: 'modelled',
+      source: 'Continuumm port concentration estimate for North Sea/Baltic access.',
+    },
+  },
+  turkey: {
+    pipelineBypassPct: {
+      value: 36,
+      basis: 'observed-inferred',
+      source:
+        'Pipeline corridor proxy for Turkey transit and import diversification.',
+    },
+    lngImportExposurePct: {
+      value: 22,
+      basis: 'observed-inferred',
+      source: 'IEA LNG proxy for Turkish gas supply mix.',
+    },
+    portConcentrationScore: {
+      value: 0.52,
+      basis: 'modelled',
+      source: 'Continuumm port concentration estimate for Turkish straits access.',
+    },
+  },
+  'united-states': {
+    pipelineBypassPct: {
+      value: 46,
+      basis: 'observed-inferred',
+      source:
+        'Domestic production and pipeline network proxy for import bypass capability.',
+    },
+    lngImportExposurePct: {
+      value: 8,
+      basis: 'observed',
+      source: 'Low LNG import exposure due net exporter posture.',
+    },
+    portConcentrationScore: {
+      value: 0.38,
+      basis: 'modelled',
+      source: 'Continuumm port concentration estimate for diversified coastal access.',
+    },
+  },
+}
+
+const chokepointModalProfiles = {
+  hormuz: {
+    oilWeight: 1,
+    lngWeight: 0.86,
+    containerWeight: 0.24,
+    pipelineBypassRelevance: 0.72,
+  },
+  suez: {
+    oilWeight: 0.58,
+    lngWeight: 0.36,
+    containerWeight: 0.94,
+    pipelineBypassRelevance: 0.18,
+  },
+  malacca: {
+    oilWeight: 0.82,
+    lngWeight: 0.56,
+    containerWeight: 0.98,
+    pipelineBypassRelevance: 0.24,
+  },
+  bosporus: {
+    oilWeight: 0.46,
+    lngWeight: 0.12,
+    containerWeight: 0.52,
+    pipelineBypassRelevance: 0.38,
+  },
+  'bab-el-mandeb': {
+    oilWeight: 0.64,
+    lngWeight: 0.28,
+    containerWeight: 0.9,
+    pipelineBypassRelevance: 0.2,
   },
 }
 
@@ -251,6 +526,46 @@ export function getCountryRouteDependence(countryId, chokepointId) {
   }
 
   return modelRouteShare(countryId, chokepointId)
+}
+
+export function getCountryRouteAugmenters(countryId) {
+  const configured = countryRouteAugmenters[countryId]
+
+  if (configured) {
+    return configured
+  }
+
+  const country = countriesById[countryId]
+  const shippingFactor = (country?.shippingSensitivity ?? 42) / 100
+
+  return {
+    pipelineBypassPct: {
+      value: clamp(Math.round(18 + (country?.resilience ?? 55) * 0.18), 10, 44),
+      basis: 'modelled',
+      source: 'Continuumm fallback pipeline bypass model from resilience.',
+    },
+    lngImportExposurePct: {
+      value: clamp(Math.round(12 + shippingFactor * 22), 8, 32),
+      basis: 'modelled',
+      source: 'Continuumm fallback LNG exposure model from shipping profile.',
+    },
+    portConcentrationScore: {
+      value: clamp(Number((0.42 + shippingFactor * 0.28).toFixed(2)), 0.35, 0.78),
+      basis: 'modelled',
+      source: 'Continuumm fallback port concentration model.',
+    },
+  }
+}
+
+export function getChokepointModalProfile(chokepointId) {
+  return (
+    chokepointModalProfiles[chokepointId] ?? {
+      oilWeight: 0.5,
+      lngWeight: 0.24,
+      containerWeight: 0.62,
+      pipelineBypassRelevance: 0.22,
+    }
+  )
 }
 
 export function getConflictChokepointControl({

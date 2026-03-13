@@ -316,6 +316,12 @@ function RippleBoard({
                 Throughput: {activeEffectPoint.transitMbd} mb/d | data basis:{' '}
                 {activeEffectPoint.dataBasis} ({activeEffectPoint.dataAsOf})
               </p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                Raw route share {activeEffectPoint.routeShareRawPct}% | pipeline
+                bypass {activeEffectPoint.pipelineBypassPct}% | LNG exposure{' '}
+                {activeEffectPoint.lngImportExposurePct}% | port concentration{' '}
+                {activeEffectPoint.portConcentrationScore}
+              </p>
               <div className="mt-3 space-y-2">
                 {activeEffectPoint.outcomes.map((outcome) => (
                   <div

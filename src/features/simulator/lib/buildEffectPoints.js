@@ -5,7 +5,9 @@ import {
 } from '../data/conflictSetupProfiles.js'
 import {
   chokepointOilTransitMbd,
+  getChokepointModalProfile,
   getConflictChokepointControl,
+  getCountryRouteAugmenters,
   getCountryRouteDependence,
   routeDataSnapshot,
 } from '../data/routeReality.js'
@@ -102,6 +104,8 @@ export function buildEffectPoints({
         selectedCountryId,
         chokepoint.id,
       )
+      const augmenters = getCountryRouteAugmenters(selectedCountryId)
+      const modalProfile = getChokepointModalProfile(chokepoint.id)
       const control = getConflictChokepointControl({
         aggressorId,
         defenderId,
@@ -119,6 +123,23 @@ export function buildEffectPoints({
       const corridorDependency = selectedCountry.chokepointExposure[chokepoint.id] ?? 0
       const routeShare = routeDependence.sharePct
       const routeThroughput = chokepointOilTransitMbd[chokepoint.id] ?? 0
+      const pipelineBypassPct = augmenters.pipelineBypassPct.value
+      const lngImportExposurePct = augmenters.lngImportExposurePct.value
+      const portConcentrationScore = augmenters.portConcentrationScore.value
+      const effectiveRouteShare = clamp(
+        Math.round(
+          routeShare *
+            (1 -
+              (pipelineBypassPct / 100) *
+                modalProfile.pipelineBypassRelevance *
+                0.55),
+        ),
+        1,
+        95,
+      )
+      const lngShockBoost =
+        1 + (lngImportExposurePct / 100) * modalProfile.lngWeight * 0.44
+      const portShockBoost = 1 + portConcentrationScore * modalProfile.containerWeight * 0.28
       const observedWeight =
         routeDependence.basis === 'observed'
           ? 1.14
@@ -132,7 +153,7 @@ export function buildEffectPoints({
       const score = clamp(
         Math.round(
           chokepoint.pressure * 1.06 +
-            routeShare * 1.03 * observedWeight +
+            effectiveRouteShare * 1.03 * observedWeight +
             corridorExposure * 2.35 +
             corridorDependency * 2.65 +
             routeThroughput * 1.4 +
@@ -145,12 +166,16 @@ export function buildEffectPoints({
       )
       const adjustedScore = clamp(
         Math.round(
-          score * conflictMode.routeShockMultiplier * duration.routeShockMultiplier,
+          score *
+            lngShockBoost *
+            portShockBoost *
+            conflictMode.routeShockMultiplier *
+            duration.routeShockMultiplier,
         ),
         5,
         98,
       )
-      const modelledImportShare = clamp(Math.round(routeShare), 1, 95)
+      const modelledImportShare = clamp(Math.round(effectiveRouteShare), 1, 95)
       const templates =
         effectTemplates[chokepoint.id] ?? [
           { id: 'market', label: 'Commodity and freight pricing', weight: 1 },
@@ -182,11 +207,15 @@ export function buildEffectPoints({
         dataBasis: routeDependence.basis,
         dataSource: routeDependence.source,
         dataAsOf: routeDataSnapshot.asOf,
+        routeShareRawPct: routeShare,
+        pipelineBypassPct,
+        lngImportExposurePct,
+        portConcentrationScore,
         controlBy: control.controllerName,
         controlMode: control.mode,
         controlNarrative: control.narrative,
         transitMbd: control.transitMbd,
-        whyLine: `${selectedCountry.name} has ${modelledImportShare}% oil-route dependence through ${chokepoint.name}, and ${control.controllerName} can disrupt this corridor under ${conflictMode.label.toLowerCase()} over ${duration.label.toLowerCase()}.`,
+        whyLine: `${selectedCountry.name} has ${modelledImportShare}% effective route dependence through ${chokepoint.name} (raw ${routeShare}%, pipeline bypass ${pipelineBypassPct}%), and ${control.controllerName} can disrupt this corridor under ${conflictMode.label.toLowerCase()} over ${duration.label.toLowerCase()}.`,
       }
     })
     .filter(Boolean)
