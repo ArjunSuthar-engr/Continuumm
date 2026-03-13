@@ -9,7 +9,14 @@ export { default as WarSetupPanel } from './components/WarSetupPanel.jsx'
 export { defaultScenarioConfig } from './data/defaultScenario.js'
 export { chokepoints, countries, focusModes } from './data/network.js'
 export { defaultPresetId, scenarioPresets } from './data/scenarioPresets.js'
+export {
+  getConflictChokepointControl,
+  getConflictControlMap,
+  getCountryRouteDependence,
+  routeDataSnapshot,
+} from './data/routeReality.js'
 export { useConflictScenario } from './hooks/useConflictScenario.js'
 export { deriveConflictChokepoints } from './lib/deriveConflictChokepoints.js'
+export { buildEffectPoints } from './lib/buildEffectPoints.js'
 export { fetchLiveSignalsSnapshot } from './lib/fetchLiveSignals.js'
 export { simulateConflict } from './lib/simulateConflict.js'

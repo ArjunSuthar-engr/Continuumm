@@ -1,14 +1,11 @@
 import { chokepoints, countriesById } from '../data/network.js'
+import {
+  chokepointOilTransitMbd,
+  getConflictControlMap,
+} from '../data/routeReality.js'
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max)
-}
-
-function includesPair(aggressorId, defenderId, countryA, countryB) {
-  return (
-    (aggressorId === countryA && defenderId === countryB) ||
-    (aggressorId === countryB && defenderId === countryA)
-  )
 }
 
 function regionalBoost(chokepoint, aggressor, defender) {
@@ -44,11 +41,14 @@ function scoreChokepoint(chokepoint, aggressor, defender, intensity) {
       .slice(0, 4)
       .reduce((sum, value) => sum + value, 0) / 4
 
+  const transitThroughput = chokepointOilTransitMbd[chokepoint.id] ?? 0
+
   return (
     chokepoint.pressure +
     directExposure * 3.1 +
     corridorDependency * 2.2 +
     networkExposure * 1.6 +
+    transitThroughput * 1.7 +
     intensity * 0.16 +
     regionalBoost(chokepoint, aggressor, defender)
   )
@@ -59,10 +59,6 @@ export function deriveConflictChokepoints({
   defenderId,
   intensity,
 }) {
-  if (includesPair(aggressorId, defenderId, 'united-states', 'iran')) {
-    return chokepoints.map((chokepoint) => chokepoint.id)
-  }
-
   const aggressor = countriesById[aggressorId]
   const defender = countriesById[defenderId]
 
@@ -70,14 +66,39 @@ export function deriveConflictChokepoints({
     return []
   }
 
+  const controlMap = getConflictControlMap({
+    aggressorId,
+    defenderId,
+    intensity,
+  })
+
   const scored = chokepoints
-    .map((chokepoint) => ({
-      id: chokepoint.id,
-      score: scoreChokepoint(chokepoint, aggressor, defender, intensity),
-    }))
+    .map((chokepoint) => {
+      const control = controlMap[chokepoint.id]
+      const structuralScore = scoreChokepoint(
+        chokepoint,
+        aggressor,
+        defender,
+        intensity,
+      )
+      const controlScore = control?.canDisrupt
+        ? Math.round(control.effectiveScore * 100)
+        : 0
+
+      return {
+        id: chokepoint.id,
+        canDisrupt: Boolean(control?.canDisrupt),
+        score: structuralScore * 0.62 + controlScore * 0.38,
+      }
+    })
+    .filter((item) => item.canDisrupt)
     .sort((a, b) => b.score - a.score)
 
-  const targetCount = clamp(Math.round(intensity / 20), 2, chokepoints.length)
+  if (!scored.length) {
+    return []
+  }
+
+  const targetCount = clamp(Math.round(intensity / 27), 1, scored.length)
 
   return scored.slice(0, targetCount).map((item) => item.id)
 }

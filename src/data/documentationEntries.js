@@ -6,6 +6,51 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-027',
+    date: '2026-03-14',
+    label: 'Real-data control model',
+    title: 'Added route-dependence data and chokepoint control gating to the simulator',
+    summary:
+      'Simulator effects now require chokepoint control capability by the selected war pair, and impact scoring now uses observed oil-route dependence inputs where available.',
+    items: [
+      'Added a route-reality data layer with chokepoint throughput values and country route-dependence baselines (India, China, Japan, South Korea, United States).',
+      'Introduced chokepoint control profiles so a route is highlighted only when at least one belligerent can plausibly disrupt it at the current severity.',
+      'Updated map and country insight panels to display control rationale plus data basis (observed, observed-inferred, or modelled fallback).',
+    ],
+    review:
+      'Test multiple war pairs and confirm chokepoints appear only when control thresholds are met, then verify selected-country dependence and outcome lines stay clear.',
+  },
+  {
+    id: 'log-026',
+    date: '2026-03-14',
+    label: 'Simulator interaction',
+    title: 'Added country-specific effect-point drilldown tied to the map',
+    summary:
+      'The simulator now computes and displays country-specific potential effect points from the selected war pair, with map clicks revealing concise outcome impacts and causal context.',
+    items: [
+      'Added a dedicated effect-point computation layer that scores each chokepoint for the selected country and assigns pressure bands.',
+      'Connected the map and right panel so selecting a point in either place keeps insights synchronized.',
+      'Added point-level outcome lines (for fuel, freight, insurance, and related channels) plus modelled corridor dependence context.',
+    ],
+    review:
+      'Select a war pair, then switch the right-side country and verify the map points and selected-point outcomes update clearly.',
+  },
+  {
+    id: 'log-025',
+    date: '2026-03-14',
+    label: 'Map legend',
+    title: 'Added explicit route-line legend above the simulator map',
+    summary:
+      'The map now shows a clear legend above the canvas so users can immediately understand what each line color and dash type represents.',
+    items: [
+      'Added labeled line-style cards for conflict transmission and spillover routes.',
+      'Mapped legend swatches to the exact same theme-aware line styles used by the map polylines.',
+      'Placed the legend directly above the map to reduce interpretation friction during first view.',
+    ],
+    review:
+      'Check if route meaning is now obvious at a glance without guessing line semantics.',
+  },
+  {
     id: 'log-024',
     date: '2026-03-14',
     label: 'Menu redesign',

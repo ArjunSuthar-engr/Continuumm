@@ -1,8 +1,9 @@
-import { chokepoints } from '../data/network.js'
-
 function CountryImpactPanel({
   scenario,
+  effectPoints,
   selectedCountryId,
+  selectedEffectPointId,
+  onEffectPointSelect,
   onCountrySelect,
 }) {
   const selectedCountry = scenario.countries.find(
@@ -11,16 +12,17 @@ function CountryImpactPanel({
   const selectedImpact = scenario.results.find(
     (country) => country.id === selectedCountryId,
   )
-  const topChokepoints = chokepoints
-    .map((chokepoint) => ({
-      ...chokepoint,
-      exposure:
-        (chokepoint.exposures[selectedCountryId] ?? 0) +
-        (selectedCountry?.chokepointExposure[chokepoint.id] ?? 0),
-    }))
-    .filter((chokepoint) => chokepoint.exposure > 0)
-    .sort((a, b) => b.exposure - a.exposure)
-    .slice(0, 3)
+  const selectedEffectPoint = effectPoints.find(
+    (point) => point.id === selectedEffectPointId,
+  )
+  const activeEffectPoint = selectedEffectPoint ?? effectPoints[0]
+  const hasEffectPoints = effectPoints.length > 0
+  const immediateOutcome = selectedImpact
+    ? `${selectedCountry?.name} is currently under ${selectedImpact.band.toLowerCase()} structural pressure (${selectedImpact.totalScore}/100).`
+    : `${selectedCountry?.name} is one of the belligerents, so downstream ranking appears on third-country economies.`
+  const outcomeLine = hasEffectPoints
+    ? immediateOutcome
+    : `No chokepoint is currently disruptable by ${scenario.aggressor.name} or ${scenario.defender.name}, so direct route shock on ${selectedCountry?.name} is limited in this scenario.`
 
   return (
     <aside className="panel">
@@ -30,7 +32,8 @@ function CountryImpactPanel({
           <h2 className="panel-title">Impact on one country</h2>
         </div>
         <p className="panel-copy">
-          Select any country to inspect score, drivers, and chokepoint sensitivity.
+          Select a country, then inspect map-linked effect points to understand how
+          conflict pressure can propagate into prices and logistics.
         </p>
       </div>
 
@@ -54,51 +57,76 @@ function CountryImpactPanel({
         </div>
 
         <article className="impact-card">
-          <p className="eyebrow">Score</p>
-          <h3 className="mt-2 text-4xl text-stone-100">
-            {selectedImpact ? selectedImpact.totalScore : '--'}
-          </h3>
+          <p className="eyebrow">Immediate outcome</p>
+          <p className="impact-headline">{outcomeLine}</p>
           <p className="mt-2 text-sm text-slate-300">
-            {selectedImpact
-              ? `${selectedImpact.band} pressure`
-              : 'Belligerent core country (not ranked in external spillover list).'}
+            War pair: {scenario.aggressor.name} vs {scenario.defender.name}
           </p>
         </article>
 
         <article className="impact-card">
-          <p className="eyebrow">Why this country moves</p>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
-            {selectedImpact?.narrative ?? selectedCountry?.signature}
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {(selectedImpact?.drivers ?? []).map((driver) => (
-              <span key={driver.id} className="driver-pill">
-                {driver.label}
-              </span>
-            ))}
-          </div>
-        </article>
-
-        <article className="impact-card">
-          <p className="eyebrow">Most relevant chokepoints</p>
-          <div className="mt-3 space-y-2">
-            {topChokepoints.length ? (
-              topChokepoints.map((chokepoint) => (
-                <div
-                  key={chokepoint.id}
-                  className="flex items-center justify-between gap-3 rounded-[8px] border px-3 py-2"
+          <p className="eyebrow">Potential effect points</p>
+          {hasEffectPoints ? (
+            <div className="mt-3 space-y-2">
+              {effectPoints.map((point) => (
+                <button
+                  key={point.id}
+                  type="button"
+                  className={`effect-point-row ${
+                    point.id === selectedEffectPointId
+                      ? 'effect-point-row-active'
+                      : ''
+                  }`}
+                  onClick={() => onEffectPointSelect(point.id)}
                 >
-                  <span className="text-sm text-stone-100">{chokepoint.name}</span>
-                  <span className="mono text-xs text-slate-400">
-                    exposure {chokepoint.exposure}
+                  <span className="effect-point-row-copy">
+                    <strong>{point.name}</strong>
+                    <span>
+                      dependence {point.modelledImportShare}% | score {point.score}
+                    </span>
                   </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-slate-300">
-                No strong chokepoint dependence in the current seed model.
+                  <span className="effect-point-row-band">{point.band}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-3 text-sm leading-6 text-slate-300">
+              Choose another war pair or increase severity to see routes where one
+              belligerent can realistically pressure transit.
+            </p>
+          )}
+        </article>
+
+        <article className="impact-card">
+          <p className="eyebrow">Selected point insight</p>
+          <h3 className="mt-2 text-xl text-stone-100">
+            {activeEffectPoint?.name ?? 'No effect point selected'}
+          </h3>
+          <p className="mt-2 text-sm leading-6 text-slate-300">
+            {activeEffectPoint
+              ? activeEffectPoint.whyLine
+              : selectedImpact?.narrative ?? selectedCountry?.signature}
+          </p>
+          {activeEffectPoint ? (
+            <>
+              <p className="mt-2 text-xs text-slate-400">
+                Control: {activeEffectPoint.controlNarrative}
               </p>
-            )}
+              <p className="mt-1 text-xs text-slate-500">
+                Data basis: {activeEffectPoint.dataBasis} | source:{' '}
+                {activeEffectPoint.dataSource}
+              </p>
+            </>
+          ) : null}
+          <div className="effect-outcome-list">
+            {(activeEffectPoint?.outcomes ?? []).map((outcome) => (
+              <div key={outcome.id} className="effect-outcome-item">
+                <span>{outcome.label}</span>
+                <strong>
+                  {outcome.effect} | {outcome.score}/100
+                </strong>
+              </div>
+            ))}
           </div>
         </article>
       </div>

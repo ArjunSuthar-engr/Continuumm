@@ -11,35 +11,58 @@ import { useTheme } from '../../../components/layout/themeContext'
 function RippleBoard({
   scenario,
   blockedChokepointIds,
+  effectPoints,
   selectedCountryId,
   onSelectCountry,
-  selectedChokepointId,
+  selectedEffectPointId,
   onSelectChokepoint,
 }) {
   const { theme } = useTheme()
   const highlightedChokepoints = new Set(blockedChokepointIds)
   const topAffectedIds = new Set(scenario.topAffected.map((country) => country.id))
   const routeCountries = scenario.topAffected.slice(0, 4)
-  const selectedChokepoint = scenario.chokepoints.find(
-    (chokepoint) => chokepoint.id === selectedChokepointId,
+  const selectedCountryName =
+    scenario.countries.find((country) => country.id === selectedCountryId)?.name ??
+    'Selected country'
+  const selectedEffectPoint = effectPoints.find(
+    (point) => point.id === selectedEffectPointId,
   )
-  const selectedChokepointImpact = selectedChokepoint
-    ? scenario.results
-        .map((country) => ({
-          ...country,
-          chokepointExposure:
-            (selectedChokepoint.exposures[country.id] ?? 0) +
-            (country.chokepointExposure[selectedChokepoint.id] ?? 0),
-        }))
-        .filter((country) => country.chokepointExposure > 0)
-        .sort((a, b) => b.chokepointExposure - a.chokepointExposure)
-        .slice(0, 4)
-    : []
+  const activeEffectPoint = selectedEffectPoint ?? effectPoints[0]
 
   const tileUrl =
     theme === 'light'
       ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
       : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+  const lineStyles = {
+    conflict: {
+      name: 'Conflict transmission',
+      note: 'Direct shock path from belligerents into exposed economies.',
+      color: theme === 'light' ? '#ad6735' : '#ffb874',
+      dashArray: '7 8',
+      weight: 2.8,
+      opacity: 0.7,
+    },
+    spillover: {
+      name: 'Spillover route',
+      note: 'Secondary rerouting and market-pressure propagation channels.',
+      color: theme === 'light' ? '#4f7fa4' : '#7baccd',
+      dashArray: '4 9',
+      weight: 2,
+      opacity: 0.55,
+    },
+  }
+
+  const pointBandStyles = {
+    High: {
+      color: theme === 'light' ? '#b65934' : '#f18c53',
+    },
+    Elevated: {
+      color: theme === 'light' ? '#5f84a2' : '#7ca8ca',
+    },
+    Watch: {
+      color: theme === 'light' ? '#768d9f' : '#8ca4b6',
+    },
+  }
 
   const lines = routeCountries.flatMap((country) => {
     const fromAggressor = scenario.aggressor.coordinates
@@ -78,8 +101,8 @@ function RippleBoard({
           <h2 className="panel-title">Global spillover</h2>
         </div>
         <p className="panel-copy">
-          Red chokepoints are under stress for this war pair. Click any chokepoint
-          to see which countries it may affect.
+          Red chokepoints are shown only when this war pair can plausibly disrupt
+          route control. Click a point to inspect direct impact pathways.
         </p>
       </div>
 
@@ -92,13 +115,56 @@ function RippleBoard({
             </strong>
           </div>
           <div className="stat-chip">
-            <span className="stat-chip-label">Red chokepoints</span>
+            <span className="stat-chip-label">Controllable chokepoints</span>
             <strong className="stat-chip-value">{blockedChokepointIds.length}</strong>
           </div>
           <div className="stat-chip">
             <span className="stat-chip-label">Top spillover</span>
             <strong className="stat-chip-value">{scenario.topAffected[0].name}</strong>
           </div>
+        </div>
+
+        <div className="map-line-legend">
+          {Object.entries(lineStyles).map(([lineId, lineStyle]) => (
+            <article key={lineId} className="line-legend-item">
+              <svg
+                viewBox="0 0 100 12"
+                className="line-legend-swatch"
+                aria-hidden="true"
+              >
+                <line
+                  x1="2"
+                  y1="6"
+                  x2="98"
+                  y2="6"
+                  stroke={lineStyle.color}
+                  strokeWidth={lineStyle.weight}
+                  strokeDasharray={lineStyle.dashArray}
+                  strokeLinecap="round"
+                  opacity={lineStyle.opacity}
+                />
+              </svg>
+              <div className="line-legend-copy">
+                <strong>{lineStyle.name}</strong>
+                <span>{lineStyle.note}</span>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="map-point-legend">
+          <article className="point-legend-item">
+            <span className="point-legend-dot point-legend-dot-high" />
+            <span>High effect (control + dependence)</span>
+          </article>
+          <article className="point-legend-item">
+            <span className="point-legend-dot point-legend-dot-elevated" />
+            <span>Elevated effect (partial dependence)</span>
+          </article>
+          <article className="point-legend-item">
+            <span className="point-legend-dot point-legend-dot-watch" />
+            <span>Watch-level effect</span>
+          </article>
         </div>
 
         <div className="world-map-shell mt-4">
@@ -121,17 +187,10 @@ function RippleBoard({
                 key={line.id}
                 positions={line.positions}
                 pathOptions={{
-                  weight: line.type === 'conflict' ? 2.8 : 2,
-                  opacity: line.type === 'conflict' ? 0.7 : 0.55,
-                  color:
-                    line.type === 'conflict'
-                      ? theme === 'light'
-                        ? '#ad6735'
-                        : '#ffb874'
-                      : theme === 'light'
-                        ? '#4f7fa4'
-                        : '#7baccd',
-                  dashArray: line.type === 'conflict' ? '7 8' : '4 9',
+                  weight: lineStyles[line.type].weight,
+                  opacity: lineStyles[line.type].opacity,
+                  color: lineStyles[line.type].color,
+                  dashArray: lineStyles[line.type].dashArray,
                 }}
               />
             ))}
@@ -194,43 +253,40 @@ function RippleBoard({
               )
             })}
 
-            {scenario.chokepoints.map((chokepoint) => {
-              if (!chokepoint.coordinates) {
+            {effectPoints.map((point) => {
+              if (!point.coordinates) {
                 return null
               }
 
-              const isHighlighted = highlightedChokepoints.has(chokepoint.id)
-              const isSelected = chokepoint.id === selectedChokepointId
-              const color = isHighlighted
-                ? theme === 'light'
-                  ? '#b65934'
-                  : '#f18c53'
-                : theme === 'light'
-                  ? '#70889e'
-                  : '#8aa4ba'
+              const isHighlighted = highlightedChokepoints.has(point.id)
+              const isSelected = point.id === selectedEffectPointId
+              const style = pointBandStyles[point.band] ?? pointBandStyles.Watch
+              const radius = isSelected
+                ? 8.4
+                : Math.min(7.8, 4.6 + point.score / 30)
 
               return (
                 <CircleMarker
-                  key={chokepoint.id}
-                  center={[chokepoint.coordinates.lat, chokepoint.coordinates.lng]}
-                  radius={isSelected ? 7 : 5.2}
+                  key={point.id}
+                  center={[point.coordinates.lat, point.coordinates.lng]}
+                  radius={radius}
                   pathOptions={{
-                    color,
-                    fillColor: color,
+                    color: style.color,
+                    fillColor: style.color,
                     fillOpacity: 0.92,
-                    weight: isSelected ? 2.3 : 1.2,
+                    weight: isSelected ? 2.5 : isHighlighted ? 2 : 1.2,
                   }}
                   eventHandlers={{
-                    click: () => onSelectChokepoint(chokepoint.id),
+                    click: () => onSelectChokepoint(point.id),
                   }}
                 >
                   <Tooltip
-                    permanent={isHighlighted || isSelected}
+                    permanent={isSelected || point.rank <= 2}
                     direction="right"
                     offset={[6, 0]}
                     className="world-map-tooltip"
                   >
-                    {chokepoint.name}
+                    {point.name} | {point.band}
                   </Tooltip>
                 </CircleMarker>
               )
@@ -240,34 +296,47 @@ function RippleBoard({
 
         <article className="mini-panel mt-4">
           <p className="eyebrow">
-            {selectedChokepoint ? 'Selected chokepoint effect' : 'How to use'}
+            {activeEffectPoint ? 'Selected effect point' : 'How to use'}
           </p>
-          {selectedChokepoint ? (
+          {activeEffectPoint ? (
             <>
               <h3 className="mt-2 text-2xl text-stone-100">
-                {selectedChokepoint.name}
+                {activeEffectPoint.name}
               </h3>
               <p className="mt-2 text-sm leading-6 text-slate-300">
-                {selectedChokepoint.note}
+                {selectedCountryName} oil-route dependence:{' '}
+                <strong>{activeEffectPoint.modelledImportShare}%</strong> | pressure{' '}
+                <strong>{activeEffectPoint.band}</strong> ({activeEffectPoint.score}
+                /100)
+              </p>
+              <p className="mt-2 text-xs leading-5 text-slate-400">
+                Control: {activeEffectPoint.controlNarrative}
+              </p>
+              <p className="mt-1 text-xs leading-5 text-slate-500">
+                Throughput: {activeEffectPoint.transitMbd} mb/d | data basis:{' '}
+                {activeEffectPoint.dataBasis} ({activeEffectPoint.dataAsOf})
               </p>
               <div className="mt-3 space-y-2">
-                {selectedChokepointImpact.map((country) => (
+                {activeEffectPoint.outcomes.map((outcome) => (
                   <div
-                    key={country.id}
+                    key={outcome.id}
                     className="flex items-center justify-between rounded-[8px] border px-3 py-2"
                   >
-                    <span className="text-sm text-stone-100">{country.name}</span>
+                    <span className="text-sm text-stone-100">{outcome.label}</span>
                     <span className="mono text-xs text-slate-400">
-                      exposure {country.chokepointExposure} | score {country.totalScore}
+                      {outcome.effect} | {outcome.score}/100
                     </span>
                   </div>
                 ))}
               </div>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                {activeEffectPoint.whyLine}
+              </p>
             </>
           ) : (
             <p className="mt-2 text-sm leading-6 text-slate-300">
-              Click any red chokepoint marker on the map to see which countries
-              could be affected through this corridor.
+              This war pair currently has no chokepoint where either belligerent
+              crosses the disruption-control threshold.
             </p>
           )}
         </article>

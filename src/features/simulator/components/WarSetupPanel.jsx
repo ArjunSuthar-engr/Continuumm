@@ -16,8 +16,8 @@ function WarSetupPanel({
           <h2 className="panel-title">Conflict pair</h2>
         </div>
         <p className="panel-copy">
-          Select the two countries. The map automatically highlights the most
-          vulnerable chokepoints in red for this war pair.
+          Select the two countries. The map highlights only chokepoints where at
+          least one belligerent can plausibly disrupt transit.
         </p>
       </div>
 
@@ -82,8 +82,9 @@ function WarSetupPanel({
             {blockedChokepointIds.length}
           </h3>
           <p className="mt-2 text-sm leading-6 text-slate-300">
-            Red markers in the map represent the chokepoints currently under the
-            highest modeled stress for this conflict.
+            {blockedChokepointIds.length > 0
+              ? 'Red markers represent chokepoints under stress that the selected war pair can actually pressure.'
+              : 'No chokepoint meets the control threshold for this war pair at the current severity.'}
           </p>
         </article>
       </div>

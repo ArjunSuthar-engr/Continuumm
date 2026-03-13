@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
+  buildEffectPoints,
   CountryImpactPanel,
   RippleBoard,
+  routeDataSnapshot,
   WarSetupPanel,
   useConflictScenario,
 } from '../features/simulator'
@@ -26,6 +28,35 @@ function SimulatorPage() {
   )
     ? selectedCountryId
     : scenario.topAffected[0]?.id ?? scenario.aggressor.id
+  const effectPoints = useMemo(
+    () =>
+      buildEffectPoints({
+        aggressorId,
+        defenderId,
+        intensity,
+        selectedCountryId: effectiveSelectedCountryId,
+        blockedChokepointIds,
+      }),
+    [
+      aggressorId,
+      defenderId,
+      intensity,
+      effectiveSelectedCountryId,
+      blockedChokepointIds,
+    ],
+  )
+  const effectiveSelectedEffectPointId = effectPoints.some(
+    (point) => point.id === selectedChokepointId,
+  )
+    ? selectedChokepointId
+    : effectPoints[0]?.id ?? null
+  const selectedCountryName =
+    scenario.countries.find((country) => country.id === effectiveSelectedCountryId)
+      ?.name ?? 'Selected country'
+  const selectedEffectPoint = effectPoints.find(
+    (point) => point.id === effectiveSelectedEffectPointId,
+  )
+  const hasControllableRoute = effectPoints.length > 0
 
   function handleWarCountryChange(kind, value) {
     handleCountryChange(kind, value)
@@ -50,6 +81,15 @@ function SimulatorPage() {
         <h1 className="simulator-headline">
           Simulate conflict spillover across global trade and strategic routes.
         </h1>
+        <p className="mt-4 text-sm leading-7 text-slate-300">
+          {hasControllableRoute
+            ? `${selectedCountryName} currently tracks ${effectPoints.length} controllable effect points. Top pressure node: ${selectedEffectPoint?.name ?? 'n/a'}.`
+            : `${scenario.aggressor.name} vs ${scenario.defender.name} has no chokepoint in this model where either belligerent can exert enough control to disrupt transit.`}
+        </p>
+        <p className="mt-2 text-xs text-slate-400">
+          Route-data snapshot: {routeDataSnapshot.asOf} (observed inputs + explicit
+          model assumptions).
+        </p>
       </section>
 
       <section className="simulator-three-pane">
@@ -65,15 +105,19 @@ function SimulatorPage() {
         <RippleBoard
           scenario={scenario}
           blockedChokepointIds={blockedChokepointIds}
+          effectPoints={effectPoints}
           selectedCountryId={effectiveSelectedCountryId}
           onSelectCountry={handleMapCountrySelect}
-          selectedChokepointId={selectedChokepointId}
+          selectedEffectPointId={effectiveSelectedEffectPointId}
           onSelectChokepoint={handleChokepointSelect}
         />
 
         <CountryImpactPanel
           scenario={scenario}
+          effectPoints={effectPoints}
           selectedCountryId={effectiveSelectedCountryId}
+          selectedEffectPointId={effectiveSelectedEffectPointId}
+          onEffectPointSelect={handleChokepointSelect}
           onCountrySelect={setSelectedCountryId}
         />
       </section>
