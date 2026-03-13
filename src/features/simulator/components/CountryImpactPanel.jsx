@@ -1,6 +1,7 @@
 function CountryImpactPanel({
   scenario,
   effectPoints,
+  countryEffects,
   selectedCountryId,
   selectedEffectPointId,
   onEffectPointSelect,
@@ -17,11 +18,13 @@ function CountryImpactPanel({
   )
   const activeEffectPoint = selectedEffectPoint ?? effectPoints[0]
   const hasEffectPoints = effectPoints.length > 0
+  const primaryEffects = countryEffects?.primaryEffects ?? []
+  const secondaryEffects = countryEffects?.secondaryEffects ?? []
   const immediateOutcome = selectedImpact
     ? `${selectedCountry?.name} is currently under ${selectedImpact.band.toLowerCase()} structural pressure (${selectedImpact.totalScore}/100).`
     : `${selectedCountry?.name} is one of the belligerents, so downstream ranking appears on third-country economies.`
   const outcomeLine = hasEffectPoints
-    ? immediateOutcome
+    ? `${countryEffects?.immediateSummary ?? immediateOutcome}`
     : `No chokepoint is currently disruptable by ${scenario.aggressor.name} or ${scenario.defender.name}, so direct route shock on ${selectedCountry?.name} is limited in this scenario.`
 
   return (
@@ -62,6 +65,61 @@ function CountryImpactPanel({
           <p className="mt-2 text-sm text-slate-300">
             War pair: {scenario.aggressor.name} vs {scenario.defender.name}
           </p>
+          <p className="mt-1 text-xs text-slate-500">
+            Secondary model snapshot: {countryEffects?.dataAsOf}
+          </p>
+        </article>
+
+        <article className="impact-card">
+          <p className="eyebrow">Primary transmission</p>
+          <div className="effect-impact-list mt-3">
+            {primaryEffects.map((effect) => (
+              <div key={effect.id} className="effect-impact-item">
+                <div className="effect-impact-copy">
+                  <strong>{effect.label}</strong>
+                  <span>{effect.summary}</span>
+                  <span className="effect-impact-source">
+                    Source: {effect.dataSource}
+                  </span>
+                </div>
+                <div className="effect-impact-meta">
+                  <span className="effect-impact-score">
+                    {effect.score}/100 | {effect.band}
+                  </span>
+                  <span className="effect-impact-tag">
+                    {effect.confidence} confidence
+                  </span>
+                  <span className="effect-impact-tag">{effect.dataBasis}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="impact-card">
+          <p className="eyebrow">Secondary domestic effects</p>
+          <div className="effect-impact-list mt-3">
+            {secondaryEffects.map((effect) => (
+              <div key={effect.id} className="effect-impact-item">
+                <div className="effect-impact-copy">
+                  <strong>{effect.label}</strong>
+                  <span>{effect.summary}</span>
+                  <span className="effect-impact-source">
+                    Source: {effect.dataSource}
+                  </span>
+                </div>
+                <div className="effect-impact-meta">
+                  <span className="effect-impact-score">
+                    {effect.score}/100 | {effect.band}
+                  </span>
+                  <span className="effect-impact-tag">
+                    {effect.confidence} confidence
+                  </span>
+                  <span className="effect-impact-tag">{effect.dataBasis}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </article>
 
         <article className="impact-card">

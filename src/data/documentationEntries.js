@@ -6,6 +6,36 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-029',
+    date: '2026-03-14',
+    label: 'Secondary effects engine',
+    title: 'Added primary vs secondary country effects with confidence and data-basis tags',
+    summary:
+      'Country impact analysis now separates route-level primary transmission from domestic secondary effects, including fuel, freight, inflation, manufacturing/logistics, and electricity impacts.',
+    items: [
+      'Added a country secondary-sensitivity data layer with gas-power mix and pass-through coefficients plus basis/source metadata.',
+      'Implemented a country-effects engine that computes primary and secondary effects with score bands, confidence tags, and basis labels.',
+      'Updated the right-side country panel to show concise primary/secondary effect cards and explicit source lines for each effect.',
+    ],
+    review:
+      'Select a country under a controllable chokepoint scenario and verify electricity remains limited where gas power share is low, while fuel/freight effects remain stronger.',
+  },
+  {
+    id: 'log-028',
+    date: '2026-03-14',
+    label: 'Conflict setup expansion',
+    title: 'Added conflict mode, duration horizon, and left-panel control explainers',
+    summary:
+      'The simulator war setup now includes conflict-mode and duration controls, and these selections are wired into chokepoint eligibility and country-impact scoring rather than being UI-only toggles.',
+    items: [
+      'Added conflict-mode profiles (blockade, sanctions, strikes, proxy, cyber-logistics) and duration profiles (2 weeks, 2 months, 6 months).',
+      'Wired mode/duration into route-control gating, chokepoint highlighting, effect-point scoring, and simulator channel pressure logic.',
+      'Added a control-explainer section in the left panel showing controller, effective leverage score, threshold, and eligibility status per chokepoint.',
+    ],
+    review:
+      'Change conflict mode and duration for the same country pair and verify that both highlighted chokepoints and impact intensity adjust accordingly.',
+  },
+  {
     id: 'log-027',
     date: '2026-03-14',
     label: 'Real-data control model',

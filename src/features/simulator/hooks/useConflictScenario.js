@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import {
+  conflictDurations,
+  conflictModes,
+} from '../data/conflictSetupProfiles.js'
 import { defaultScenarioConfig } from '../data/defaultScenario.js'
 import { countries, countriesById } from '../data/network.js'
+import { getConflictControlMap } from '../data/routeReality.js'
 import { defaultPresetId, scenarioPresets } from '../data/scenarioPresets.js'
 import { deriveConflictChokepoints } from '../lib/deriveConflictChokepoints.js'
 import { fetchLiveSignalsSnapshot } from '../lib/fetchLiveSignals.js'
@@ -18,8 +23,20 @@ function cloneInitialConfig(initialConfig) {
       aggressorId: baseConfig.aggressorId,
       defenderId: baseConfig.defenderId,
       intensity: baseConfig.intensity,
+      conflictModeId: baseConfig.conflictModeId,
+      durationId: baseConfig.durationId,
     }),
   }
+}
+
+function deriveBlockedChokepoints(config) {
+  return deriveConflictChokepoints({
+    aggressorId: config.aggressorId,
+    defenderId: config.defenderId,
+    intensity: config.intensity,
+    conflictModeId: config.conflictModeId,
+    durationId: config.durationId,
+  })
 }
 
 function getFallbackCountryId(excludedId) {
@@ -54,11 +71,7 @@ export function useConflictScenario(
 
         return {
           ...next,
-          blockedChokepointIds: deriveConflictChokepoints({
-            aggressorId: next.aggressorId,
-            defenderId: next.defenderId,
-            intensity: next.intensity,
-          }),
+          blockedChokepointIds: deriveBlockedChokepoints(next),
         }
       }
 
@@ -73,26 +86,24 @@ export function useConflictScenario(
 
       return {
         ...next,
-        blockedChokepointIds: deriveConflictChokepoints({
-          aggressorId: next.aggressorId,
-          defenderId: next.defenderId,
-          intensity: next.intensity,
-        }),
+        blockedChokepointIds: deriveBlockedChokepoints(next),
       }
     })
   }
 
   function setIntensity(intensity) {
     setActivePresetId(null)
-    setConfig((current) => ({
-      ...current,
-      intensity,
-      blockedChokepointIds: deriveConflictChokepoints({
-        aggressorId: current.aggressorId,
-        defenderId: current.defenderId,
+    setConfig((current) => {
+      const next = {
+        ...current,
         intensity,
-      }),
-    }))
+      }
+
+      return {
+        ...next,
+        blockedChokepointIds: deriveBlockedChokepoints(next),
+      }
+    })
   }
 
   function setFocusModeId(focusModeId) {
@@ -103,6 +114,36 @@ export function useConflictScenario(
     }))
   }
 
+  function setConflictModeId(conflictModeId) {
+    setActivePresetId(null)
+    setConfig((current) => {
+      const next = {
+        ...current,
+        conflictModeId,
+      }
+
+      return {
+        ...next,
+        blockedChokepointIds: deriveBlockedChokepoints(next),
+      }
+    })
+  }
+
+  function setDurationId(durationId) {
+    setActivePresetId(null)
+    setConfig((current) => {
+      const next = {
+        ...current,
+        durationId,
+      }
+
+      return {
+        ...next,
+        blockedChokepointIds: deriveBlockedChokepoints(next),
+      }
+    })
+  }
+
   function toggleChokepoint(chokepointId) {
     setActivePresetId(null)
     setConfig((current) => ({
@@ -110,7 +151,7 @@ export function useConflictScenario(
       blockedChokepointIds: current.blockedChokepointIds.includes(chokepointId)
         ? current.blockedChokepointIds.filter((id) => id !== chokepointId)
         : [...current.blockedChokepointIds, chokepointId],
-      }))
+    }))
   }
 
   async function refreshLiveSignals(options = {}) {
@@ -171,10 +212,9 @@ export function useConflictScenario(
     setConfig((current) => ({
       ...current,
       ...preset.config,
-      blockedChokepointIds: deriveConflictChokepoints({
-        aggressorId: preset.config.aggressorId,
-        defenderId: preset.config.defenderId,
-        intensity: preset.config.intensity,
+      blockedChokepointIds: deriveBlockedChokepoints({
+        ...current,
+        ...preset.config,
       }),
     }))
 
@@ -224,17 +264,30 @@ export function useConflictScenario(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const controlMap = getConflictControlMap({
+    aggressorId: config.aggressorId,
+    defenderId: config.defenderId,
+    intensity: config.intensity,
+    conflictModeId: config.conflictModeId,
+    durationId: config.durationId,
+  })
+
   return {
     ...config,
+    controlMap,
     scenario: simulateConflict({
       ...config,
       liveSignals: enableLive && liveOverlayEnabled ? liveSignals : null,
     }),
+    conflictModes,
+    conflictDurations,
     presets: scenarioPresets,
     activePresetId,
     handleCountryChange,
     setIntensity,
     setFocusModeId,
+    setConflictModeId,
+    setDurationId,
     toggleChokepoint,
     liveSignals,
     liveStatus,

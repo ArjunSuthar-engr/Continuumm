@@ -1,4 +1,8 @@
 import { chokepointsById, countriesById } from './network.js'
+import {
+  getConflictDurationById,
+  getConflictModeById,
+} from './conflictSetupProfiles.js'
 
 export const routeDataSnapshot = {
   asOf: '2026-03-14',
@@ -254,9 +258,13 @@ export function getConflictChokepointControl({
   defenderId,
   chokepointId,
   intensity,
+  conflictModeId,
+  durationId,
 }) {
   const profile = chokepointControlProfiles[chokepointId]
   const chokepointName = chokepointsById[chokepointId]?.name ?? chokepointId
+  const conflictMode = getConflictModeById(conflictModeId)
+  const duration = getConflictDurationById(durationId)
 
   if (!profile) {
     return {
@@ -299,31 +307,53 @@ export function getConflictChokepointControl({
 
   const strongest = candidateControllers.sort((a, b) => b.score - a.score)[0]
   const intensityBoost = clamp((intensity - 45) / 220, 0, 0.24)
-  const effectiveScore = clamp(strongest.score + intensityBoost, 0, 0.99)
-  const canDisrupt = effectiveScore >= profile.threshold
+  const effectiveScore = clamp(
+    strongest.score +
+      intensityBoost +
+      conflictMode.controlBoost +
+      duration.controlBoost,
+    0,
+    0.99,
+  )
+  const effectiveThreshold = clamp(
+    profile.threshold + conflictMode.thresholdShift + duration.thresholdShift,
+    0.4,
+    0.95,
+  )
+  const canDisrupt = effectiveScore >= effectiveThreshold
   const controllerName =
     countriesById[strongest.countryId]?.name ?? strongest.countryId
   const effectivePct = Math.round(effectiveScore * 100)
-  const thresholdPct = Math.round(profile.threshold * 100)
+  const thresholdPct = Math.round(effectiveThreshold * 100)
 
   return {
     chokepointId,
     chokepointName,
     canDisrupt,
     effectiveScore,
-    threshold: profile.threshold,
+    threshold: effectiveThreshold,
     controllerId: strongest.countryId,
     controllerName,
     mode: strongest.mode,
     note: strongest.note,
+    conflictModeId: conflictMode.id,
+    conflictModeLabel: conflictMode.label,
+    durationId: duration.id,
+    durationLabel: duration.label,
     transitMbd: chokepointOilTransitMbd[chokepointId] ?? 0,
     narrative: canDisrupt
-      ? `${controllerName} has ${strongest.mode} chokepoint leverage (${effectivePct}/100), above the disruption threshold (${thresholdPct}/100).`
-      : `${controllerName} has ${strongest.mode} leverage (${effectivePct}/100), below the disruption threshold (${thresholdPct}/100).`,
+      ? `${controllerName} has ${strongest.mode} chokepoint leverage (${effectivePct}/100), above the disruption threshold (${thresholdPct}/100) for ${conflictMode.label.toLowerCase()} over ${duration.label.toLowerCase()}.`
+      : `${controllerName} has ${strongest.mode} leverage (${effectivePct}/100), below the disruption threshold (${thresholdPct}/100) for ${conflictMode.label.toLowerCase()} over ${duration.label.toLowerCase()}.`,
   }
 }
 
-export function getConflictControlMap({ aggressorId, defenderId, intensity }) {
+export function getConflictControlMap({
+  aggressorId,
+  defenderId,
+  intensity,
+  conflictModeId,
+  durationId,
+}) {
   return Object.fromEntries(
     Object.keys(chokepointsById).map((chokepointId) => [
       chokepointId,
@@ -332,6 +362,8 @@ export function getConflictControlMap({ aggressorId, defenderId, intensity }) {
         defenderId,
         chokepointId,
         intensity,
+        conflictModeId,
+        durationId,
       }),
     ]),
   )

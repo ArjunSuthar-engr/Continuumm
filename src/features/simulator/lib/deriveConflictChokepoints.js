@@ -1,5 +1,9 @@
 import { chokepoints, countriesById } from '../data/network.js'
 import {
+  getConflictDurationById,
+  getConflictModeById,
+} from '../data/conflictSetupProfiles.js'
+import {
   chokepointOilTransitMbd,
   getConflictControlMap,
 } from '../data/routeReality.js'
@@ -58,9 +62,13 @@ export function deriveConflictChokepoints({
   aggressorId,
   defenderId,
   intensity,
+  conflictModeId,
+  durationId,
 }) {
   const aggressor = countriesById[aggressorId]
   const defender = countriesById[defenderId]
+  const conflictMode = getConflictModeById(conflictModeId)
+  const duration = getConflictDurationById(durationId)
 
   if (!aggressor || !defender) {
     return []
@@ -70,6 +78,8 @@ export function deriveConflictChokepoints({
     aggressorId,
     defenderId,
     intensity,
+    conflictModeId,
+    durationId,
   })
 
   const scored = chokepoints
@@ -88,7 +98,12 @@ export function deriveConflictChokepoints({
       return {
         id: chokepoint.id,
         canDisrupt: Boolean(control?.canDisrupt),
-        score: structuralScore * 0.62 + controlScore * 0.38,
+        score:
+          structuralScore * 0.52 +
+          controlScore * 0.48 +
+          (chokepointOilTransitMbd[chokepoint.id] ?? 0) *
+            conflictMode.routeShockMultiplier *
+            duration.routeShockMultiplier,
       }
     })
     .filter((item) => item.canDisrupt)
@@ -98,7 +113,15 @@ export function deriveConflictChokepoints({
     return []
   }
 
-  const targetCount = clamp(Math.round(intensity / 27), 1, scored.length)
+  const targetCount = clamp(
+    Math.round(
+      (intensity / 33) *
+        conflictMode.routeShockMultiplier *
+        duration.routeShockMultiplier,
+    ),
+    1,
+    scored.length,
+  )
 
   return scored.slice(0, targetCount).map((item) => item.id)
 }

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import {
+  buildCountryEffects,
   buildEffectPoints,
   CountryImpactPanel,
   RippleBoard,
@@ -12,10 +13,17 @@ function SimulatorPage() {
   const {
     aggressorId,
     defenderId,
+    conflictModeId,
+    durationId,
     intensity,
     blockedChokepointIds,
+    controlMap,
+    conflictModes,
+    conflictDurations,
     scenario,
     handleCountryChange,
+    setConflictModeId,
+    setDurationId,
     setIntensity,
   } = useConflictScenario(undefined, { enableLive: false })
 
@@ -33,6 +41,8 @@ function SimulatorPage() {
       buildEffectPoints({
         aggressorId,
         defenderId,
+        conflictModeId,
+        durationId,
         intensity,
         selectedCountryId: effectiveSelectedCountryId,
         blockedChokepointIds,
@@ -40,6 +50,8 @@ function SimulatorPage() {
     [
       aggressorId,
       defenderId,
+      conflictModeId,
+      durationId,
       intensity,
       effectiveSelectedCountryId,
       blockedChokepointIds,
@@ -57,6 +69,21 @@ function SimulatorPage() {
     (point) => point.id === effectiveSelectedEffectPointId,
   )
   const hasControllableRoute = effectPoints.length > 0
+  const countryEffects = useMemo(
+    () =>
+      buildCountryEffects({
+        scenario,
+        effectPoints,
+        selectedCountryId: effectiveSelectedCountryId,
+        selectedEffectPointId: effectiveSelectedEffectPointId,
+      }),
+    [
+      scenario,
+      effectPoints,
+      effectiveSelectedCountryId,
+      effectiveSelectedEffectPointId,
+    ],
+  )
 
   function handleWarCountryChange(kind, value) {
     handleCountryChange(kind, value)
@@ -90,15 +117,26 @@ function SimulatorPage() {
           Route-data snapshot: {routeDataSnapshot.asOf} (observed inputs + explicit
           model assumptions).
         </p>
+        <p className="mt-1 text-xs text-slate-500">
+          Conflict posture: {scenario.conflictMode.label} | horizon:{' '}
+          {scenario.duration.label}
+        </p>
       </section>
 
       <section className="simulator-three-pane">
         <WarSetupPanel
           aggressorId={aggressorId}
           defenderId={defenderId}
+          conflictModeId={conflictModeId}
+          durationId={durationId}
           intensity={intensity}
           blockedChokepointIds={blockedChokepointIds}
+          controlMap={controlMap}
+          conflictModes={conflictModes}
+          conflictDurations={conflictDurations}
           onCountryChange={handleWarCountryChange}
+          onConflictModeChange={setConflictModeId}
+          onDurationChange={setDurationId}
           onIntensityChange={setIntensity}
         />
 
@@ -115,6 +153,7 @@ function SimulatorPage() {
         <CountryImpactPanel
           scenario={scenario}
           effectPoints={effectPoints}
+          countryEffects={countryEffects}
           selectedCountryId={effectiveSelectedCountryId}
           selectedEffectPointId={effectiveSelectedEffectPointId}
           onEffectPointSelect={handleChokepointSelect}

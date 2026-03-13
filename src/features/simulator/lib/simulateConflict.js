@@ -1,4 +1,8 @@
 import {
+  getConflictDurationById,
+  getConflictModeById,
+} from '../data/conflictSetupProfiles.js'
+import {
   chokepoints,
   chokepointsById,
   countries,
@@ -49,6 +53,8 @@ export function simulateConflict({
   aggressorId,
   defenderId,
   focusModeId,
+  conflictModeId,
+  durationId,
   intensity,
   blockedChokepointIds,
   liveSignals,
@@ -57,23 +63,26 @@ export function simulateConflict({
   const defender = countriesById[defenderId]
   const focusMode =
     focusModes.find((mode) => mode.id === focusModeId) ?? focusModes[0]
+  const conflictMode = getConflictModeById(conflictModeId)
+  const duration = getConflictDurationById(durationId)
   const blockedChokepoints = blockedChokepointIds
     .map((id) => chokepointsById[id])
     .filter(Boolean)
   const liveMetrics = liveSignals?.metrics ?? null
-  const baseIntensityFactor = intensity / 100
+  const baseIntensityFactor = (intensity / 100) * duration.intensityMultiplier
   const liveIntensityFactor = liveMetrics
     ? clamp(
-        (intensity +
+        ((intensity +
           Math.round(
             liveMetrics.conflictHeat * 0.14 +
               liveMetrics.oilStress * 0.18 +
               liveMetrics.shippingStress * 0.1 -
               20,
           )) /
-          100,
+          100) *
+          duration.intensityMultiplier,
         0.25,
-        1.24,
+        1.36,
       )
     : baseIntensityFactor
 
@@ -90,6 +99,8 @@ export function simulateConflict({
         shipping: 1,
         strategic: 1,
       }
+
+  const conflictChannelMultipliers = conflictMode.channelMultipliers
 
   const results = countries
     .filter((country) => country.id !== aggressorId && country.id !== defenderId)
@@ -122,19 +133,25 @@ export function simulateConflict({
 
       const channelScores = {
         trade:
-          tradeExposure * focusMode.weights.trade * liveChannelMultipliers.trade,
+          tradeExposure *
+          focusMode.weights.trade *
+          liveChannelMultipliers.trade *
+          conflictChannelMultipliers.trade,
         energy:
           (directEnergyExposure + chokepointEnergyExposure) *
           focusMode.weights.energy *
-          liveChannelMultipliers.energy,
+          liveChannelMultipliers.energy *
+          conflictChannelMultipliers.energy,
         shipping:
           shippingExposure *
           focusMode.weights.shipping *
-          liveChannelMultipliers.shipping,
+          liveChannelMultipliers.shipping *
+          conflictChannelMultipliers.shipping,
         strategic:
           strategicExposure *
           focusMode.weights.strategic *
-          liveChannelMultipliers.strategic,
+          liveChannelMultipliers.strategic *
+          conflictChannelMultipliers.strategic,
       }
 
       const rawScore = Object.values(channelScores).reduce(
@@ -239,7 +256,7 @@ export function simulateConflict({
     detourMiles: Math.round(
       blockedChokepoints.length * 1400 +
         totalPressure * 65 +
-        intensity * 14 +
+        intensity * 14 * duration.intensityMultiplier +
         (liveMetrics?.shippingStress ?? 0) * 24,
     ),
     fuelPressure: clamp(
@@ -272,6 +289,8 @@ export function simulateConflict({
     aggressor,
     defender,
     focusMode,
+    conflictMode,
+    duration,
     blockedChokepoints,
     chokepoints,
     countries,

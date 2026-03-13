@@ -1,4 +1,7 @@
 import assert from 'node:assert/strict'
+import { buildCountryEffects } from '../src/features/simulator/lib/buildCountryEffects.js'
+import { buildEffectPoints } from '../src/features/simulator/lib/buildEffectPoints.js'
+import { deriveConflictChokepoints } from '../src/features/simulator/lib/deriveConflictChokepoints.js'
 import { simulateConflict } from '../src/features/simulator/lib/simulateConflict.js'
 
 function runTest(name, testFn) {
@@ -97,6 +100,162 @@ runTest('changes channel emphasis when the analytical focus changes', () => {
     maritime.channelPressure.shipping > balanced.channelPressure.shipping,
     true,
   )
+})
+
+runTest('conflict mode modifies route-driven channel stress', () => {
+  const blockade = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 76,
+    blockedChokepointIds: ['hormuz', 'bab-el-mandeb', 'suez'],
+  })
+  const sanctions = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'sanctions',
+    durationId: '2m',
+    intensity: 76,
+    blockedChokepointIds: ['hormuz', 'bab-el-mandeb', 'suez'],
+  })
+
+  assert.equal(
+    blockade.channelPressure.shipping > sanctions.channelPressure.shipping,
+    true,
+  )
+  assert.equal(
+    sanctions.channelPressure.trade >= blockade.channelPressure.trade,
+    true,
+  )
+})
+
+runTest('longer conflict duration raises total stress for same setup', () => {
+  const shortHorizon = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'strikes',
+    durationId: '2w',
+    intensity: 76,
+    blockedChokepointIds: ['hormuz', 'bab-el-mandeb', 'suez'],
+  })
+  const longHorizon = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'strikes',
+    durationId: '6m',
+    intensity: 76,
+    blockedChokepointIds: ['hormuz', 'bab-el-mandeb', 'suez'],
+  })
+
+  assert.equal(
+    longHorizon.summary.averageScore > shortHorizon.summary.averageScore,
+    true,
+  )
+  assert.equal(
+    longHorizon.summary.detourMiles > shortHorizon.summary.detourMiles,
+    true,
+  )
+})
+
+runTest('secondary effects include required channels with confidence and basis', () => {
+  const blockedChokepointIds = deriveConflictChokepoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'strikes',
+    durationId: '2m',
+    intensity: 76,
+  })
+  const scenario = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'strikes',
+    durationId: '2m',
+    intensity: 76,
+    blockedChokepointIds,
+  })
+  const effectPoints = buildEffectPoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'strikes',
+    durationId: '2m',
+    intensity: 76,
+    selectedCountryId: 'india',
+    blockedChokepointIds,
+  })
+
+  const countryEffects = buildCountryEffects({
+    scenario,
+    effectPoints,
+    selectedCountryId: 'india',
+    selectedEffectPointId: effectPoints[0]?.id ?? null,
+  })
+
+  assert.equal(countryEffects.primaryEffects.length >= 2, true)
+  assert.equal(countryEffects.secondaryEffects.length >= 5, true)
+  assert.equal(
+    countryEffects.secondaryEffects.some((effect) => effect.id === 'secondary-fuel-retail'),
+    true,
+  )
+  assert.equal(
+    countryEffects.secondaryEffects.some((effect) => effect.id === 'secondary-electricity'),
+    true,
+  )
+  assert.equal(
+    countryEffects.secondaryEffects.every(
+      (effect) => Boolean(effect.confidence) && Boolean(effect.dataBasis),
+    ),
+    true,
+  )
+})
+
+runTest('india electricity effect remains lower than retail fuel effect under hormuz stress', () => {
+  const blockedChokepointIds = deriveConflictChokepoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+  })
+  const scenario = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    blockedChokepointIds,
+  })
+  const effectPoints = buildEffectPoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    selectedCountryId: 'india',
+    blockedChokepointIds,
+  })
+  const countryEffects = buildCountryEffects({
+    scenario,
+    effectPoints,
+    selectedCountryId: 'india',
+    selectedEffectPointId: effectPoints[0]?.id ?? null,
+  })
+  const fuel = countryEffects.secondaryEffects.find(
+    (effect) => effect.id === 'secondary-fuel-retail',
+  )
+  const power = countryEffects.secondaryEffects.find(
+    (effect) => effect.id === 'secondary-electricity',
+  )
+
+  assert.equal(Boolean(fuel), true)
+  assert.equal(Boolean(power), true)
+  assert.equal(fuel.score > power.score, true)
 })
 
 console.log('All simulator checks passed.')

@@ -1,5 +1,9 @@
 import { chokepointsById, countriesById } from '../data/network.js'
 import {
+  getConflictDurationById,
+  getConflictModeById,
+} from '../data/conflictSetupProfiles.js'
+import {
   chokepointOilTransitMbd,
   getConflictChokepointControl,
   getCountryRouteDependence,
@@ -70,12 +74,16 @@ export function buildEffectPoints({
   aggressorId,
   defenderId,
   intensity,
+  conflictModeId,
+  durationId,
   selectedCountryId,
   blockedChokepointIds,
 }) {
   const selectedCountry = countriesById[selectedCountryId]
   const aggressor = countriesById[aggressorId]
   const defender = countriesById[defenderId]
+  const conflictMode = getConflictModeById(conflictModeId)
+  const duration = getConflictDurationById(durationId)
   const blocked = [...new Set(blockedChokepointIds)]
 
   if (!selectedCountry || !aggressor || !defender) {
@@ -99,6 +107,8 @@ export function buildEffectPoints({
         defenderId,
         chokepointId: chokepoint.id,
         intensity,
+        conflictModeId: conflictMode.id,
+        durationId: duration.id,
       })
 
       if (!control.canDisrupt) {
@@ -133,6 +143,13 @@ export function buildEffectPoints({
         5,
         98,
       )
+      const adjustedScore = clamp(
+        Math.round(
+          score * conflictMode.routeShockMultiplier * duration.routeShockMultiplier,
+        ),
+        5,
+        98,
+      )
       const modelledImportShare = clamp(Math.round(routeShare), 1, 95)
       const templates =
         effectTemplates[chokepoint.id] ?? [
@@ -140,7 +157,7 @@ export function buildEffectPoints({
         ]
       const outcomes = templates.map((template) => {
         const magnitude = outcomeScore(
-          score,
+          adjustedScore,
           template.weight + modelledImportShare / 260,
         )
 
@@ -158,8 +175,8 @@ export function buildEffectPoints({
         note: chokepoint.note,
         coordinates: chokepoint.coordinates,
         blocked: true,
-        score,
-        band: scoreBand(score),
+        score: adjustedScore,
+        band: scoreBand(adjustedScore),
         modelledImportShare,
         outcomes,
         dataBasis: routeDependence.basis,
@@ -169,7 +186,7 @@ export function buildEffectPoints({
         controlMode: control.mode,
         controlNarrative: control.narrative,
         transitMbd: control.transitMbd,
-        whyLine: `${selectedCountry.name} has ${modelledImportShare}% oil-route dependence through ${chokepoint.name}, and ${control.controllerName} can disrupt this corridor in the selected conflict pair.`,
+        whyLine: `${selectedCountry.name} has ${modelledImportShare}% oil-route dependence through ${chokepoint.name}, and ${control.controllerName} can disrupt this corridor under ${conflictMode.label.toLowerCase()} over ${duration.label.toLowerCase()}.`,
       }
     })
     .filter(Boolean)

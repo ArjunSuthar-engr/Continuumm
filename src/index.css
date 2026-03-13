@@ -1123,6 +1123,46 @@
     background: var(--theme-soft-surface);
   }
 
+  .control-explainer-list {
+    @apply space-y-2;
+  }
+
+  .control-explainer-row {
+    @apply flex items-start justify-between gap-3 rounded-[8px] border px-3 py-2;
+    border-color: var(--theme-border);
+    background: var(--theme-contrast-surface);
+  }
+
+  .control-explainer-row-active {
+    border-color: var(--theme-accent-border);
+    background: linear-gradient(
+      135deg,
+      rgba(209, 244, 95, 0.14),
+      rgba(111, 98, 255, 0.1)
+    );
+  }
+
+  .control-explainer-copy {
+    @apply flex min-w-0 flex-col;
+  }
+
+  .control-explainer-copy strong {
+    @apply text-sm leading-tight;
+    color: var(--theme-text-strong);
+  }
+
+  .control-explainer-copy span {
+    @apply mt-1 text-xs leading-5;
+    color: var(--theme-text-muted);
+  }
+
+  .control-explainer-status {
+    @apply mono mt-0.5 rounded-full border px-2 py-1 text-[10px] uppercase tracking-[0.18em];
+    border-color: var(--theme-border);
+    color: var(--theme-text-faint);
+    background: var(--theme-soft-surface);
+  }
+
   .impact-card {
     @apply rounded-[10px] border p-4;
     border-color: var(--theme-border);
@@ -1172,6 +1212,51 @@
   .effect-point-row-band {
     @apply mono text-xs uppercase tracking-[0.18em];
     color: var(--theme-text-faint);
+  }
+
+  .effect-impact-list {
+    @apply space-y-2;
+  }
+
+  .effect-impact-item {
+    @apply rounded-[8px] border px-3 py-2;
+    border-color: var(--theme-border);
+    background: var(--theme-contrast-surface);
+  }
+
+  .effect-impact-copy {
+    @apply flex min-w-0 flex-col;
+  }
+
+  .effect-impact-copy strong {
+    @apply text-sm leading-tight;
+    color: var(--theme-text-strong);
+  }
+
+  .effect-impact-copy span {
+    @apply mt-1 text-xs leading-5;
+    color: var(--theme-text-muted);
+  }
+
+  .effect-impact-source {
+    @apply text-[11px] leading-5;
+    color: var(--theme-text-faint);
+  }
+
+  .effect-impact-meta {
+    @apply mt-2 flex flex-wrap items-center gap-2;
+  }
+
+  .effect-impact-score {
+    @apply mono text-xs uppercase tracking-[0.16em];
+    color: var(--theme-text-strong);
+  }
+
+  .effect-impact-tag {
+    @apply rounded-full border px-2 py-1 text-[10px] uppercase tracking-[0.16em];
+    border-color: var(--theme-border);
+    color: var(--theme-text-faint);
+    background: var(--theme-soft-surface);
   }
 
   .effect-outcome-list {
