@@ -104,7 +104,7 @@ export function useConflictScenario(initialConfig = defaultScenarioConfig) {
       }
 
       setLiveSignals(snapshot)
-      setLiveStatus(snapshot.sourceHealth === 'fallback' ? 'partial' : 'ready')
+      setLiveStatus(snapshot.sourceHealth === 'live' ? 'ready' : 'partial')
       return snapshot
     } catch {
       if (requestSequenceRef.current !== requestId) {
