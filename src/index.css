@@ -1,0 +1,336 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color: #d8e0e8;
+    background:
+      radial-gradient(circle at top, rgba(38, 66, 86, 0.45), transparent 34%),
+      radial-gradient(circle at bottom right, rgba(157, 114, 71, 0.16), transparent 28%),
+      linear-gradient(160deg, #040b12 0%, #06111b 32%, #081722 60%, #02060b 100%);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      radial-gradient(circle at top, rgba(204, 155, 89, 0.08), transparent 26%),
+      linear-gradient(160deg, #040b12 0%, #06111b 32%, #081722 60%, #02060b 100%);
+    background-size:
+      140px 140px,
+      140px 140px,
+      auto,
+      auto;
+    background-position:
+      center,
+      center,
+      center,
+      center;
+  }
+
+  button,
+  input,
+  select {
+    font: inherit;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p {
+    margin: 0;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  select {
+    appearance: none;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply mono text-xs uppercase tracking-[0.42em] text-slate-400;
+  }
+
+  .mono {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .panel {
+    @apply rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(7,17,26,0.92),rgba(6,19,29,0.8))] p-5 shadow-[0_18px_50px_rgba(1,8,16,0.32)] sm:p-6;
+  }
+
+  .nav-link {
+    @apply rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 no-underline transition hover:border-white/20 hover:bg-white/[0.05] hover:text-stone-100;
+  }
+
+  .nav-link-active {
+    @apply border-amber-200/40 bg-[linear-gradient(135deg,rgba(210,180,140,0.18),rgba(9,20,31,0.55))] text-stone-100;
+  }
+
+  .route-cta {
+    @apply inline-flex items-center justify-center rounded-full border border-amber-200/30 bg-[linear-gradient(135deg,rgba(210,180,140,0.22),rgba(164,112,68,0.18))] px-5 py-2.5 text-sm font-medium text-stone-100 no-underline transition hover:border-amber-200/45 hover:bg-[linear-gradient(135deg,rgba(210,180,140,0.3),rgba(164,112,68,0.26))];
+  }
+
+  .footer-link {
+    @apply rounded-full border border-white/10 px-4 py-2 text-sm text-slate-300 no-underline transition hover:border-white/20 hover:text-stone-100;
+  }
+
+  .panel-head {
+    @apply mb-6 flex flex-col gap-3 border-b border-white/10 pb-5;
+  }
+
+  .panel-title {
+    font-family: 'Cormorant Garamond', serif;
+    @apply mt-2 text-4xl leading-none text-stone-100;
+  }
+
+  .panel-copy {
+    @apply max-w-xl text-sm leading-6 text-slate-400;
+  }
+
+  .metric-card {
+    @apply rounded-[22px] border border-white/10 bg-white/5 p-4;
+  }
+
+  .story-card {
+    @apply rounded-[24px] border border-white/10 bg-white/[0.04] p-5;
+  }
+
+  .route-card {
+    @apply block rounded-[24px] border border-white/10 bg-white/[0.04] p-5 no-underline transition hover:border-amber-200/25 hover:bg-white/[0.06];
+  }
+
+  .route-loader-shell {
+    @apply flex min-h-[420px] items-center justify-center;
+  }
+
+  .route-loader-card {
+    @apply rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(7,17,26,0.92),rgba(6,19,29,0.8))] px-8 py-7 text-center shadow-[0_18px_50px_rgba(1,8,16,0.32)];
+  }
+
+  .route-loader-copy {
+    @apply mt-4 text-sm leading-6 text-slate-300;
+  }
+
+  .metric-label {
+    @apply mono text-xs uppercase tracking-[0.28em] text-slate-400;
+  }
+
+  .metric-value {
+    font-family: 'Cormorant Garamond', serif;
+    @apply mt-3 block text-3xl leading-none text-stone-100;
+  }
+
+  .metric-copy {
+    @apply mt-2 text-sm leading-6 text-slate-300;
+  }
+
+  .field-label {
+    @apply mono text-xs uppercase tracking-[0.3em] text-slate-400;
+  }
+
+  .field-control {
+    @apply mt-3 w-full rounded-[18px] border border-white/10 bg-[#091520] px-4 py-3 text-base text-stone-100 outline-none transition focus:border-amber-300/70 focus:ring-2 focus:ring-amber-200/20;
+  }
+
+  .focus-pill {
+    @apply rounded-[22px] border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:border-white/20 hover:bg-white/[0.06];
+  }
+
+  .focus-pill-active {
+    @apply border-amber-200/60 bg-[linear-gradient(135deg,rgba(210,180,140,0.16),rgba(9,20,31,0.55))] shadow-[0_0_0_1px_rgba(255,227,184,0.08)];
+  }
+
+  .chokepoint-pill {
+    @apply flex items-start justify-between gap-3 rounded-[22px] border border-white/10 bg-white/[0.03] px-4 py-4 transition hover:border-white/20 hover:bg-white/[0.06];
+  }
+
+  .chokepoint-pill-active {
+    @apply border-amber-200/60 bg-[linear-gradient(135deg,rgba(156,79,43,0.22),rgba(9,20,31,0.56))];
+  }
+
+  .stat-chip {
+    @apply rounded-[18px] border border-white/10 bg-black/20 px-4 py-3;
+  }
+
+  .stat-chip-label {
+    @apply mono text-[10px] uppercase tracking-[0.28em] text-slate-500;
+  }
+
+  .stat-chip-value {
+    @apply mt-2 block text-base font-semibold text-stone-100;
+  }
+
+  .theater-stage {
+    @apply relative overflow-hidden rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_top,rgba(37,78,108,0.28),transparent_38%),linear-gradient(180deg,rgba(5,13,20,0.6),rgba(7,17,26,0.94))];
+    min-height: 460px;
+  }
+
+  .theater-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 10% 14%;
+    opacity: 0.35;
+  }
+
+  .theater-stage::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 24%, rgba(204, 155, 89, 0.12), transparent 16%),
+      radial-gradient(circle at 72% 46%, rgba(136, 168, 186, 0.12), transparent 18%),
+      radial-gradient(circle at 88% 24%, rgba(204, 155, 89, 0.08), transparent 14%);
+    opacity: 0.8;
+  }
+
+  .theater-fog {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.06), transparent 20%),
+      radial-gradient(circle at 84% 22%, rgba(255, 255, 255, 0.05), transparent 18%),
+      radial-gradient(circle at 70% 70%, rgba(255, 255, 255, 0.04), transparent 20%);
+    mix-blend-mode: screen;
+    opacity: 0.8;
+  }
+
+  .theater-line {
+    fill: none;
+    stroke-linecap: round;
+    stroke-width: 0.3;
+    stroke-dasharray: 1.2 1.6;
+  }
+
+  .theater-line-conflict {
+    stroke: rgba(255, 184, 116, 0.65);
+  }
+
+  .theater-line-spillover {
+    stroke: rgba(123, 171, 205, 0.55);
+  }
+
+  .node-marker {
+    @apply absolute z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2;
+  }
+
+  .node-dot {
+    @apply h-3 w-3 rounded-full border border-white/10 bg-slate-300/60 shadow-[0_0_20px_rgba(214,229,238,0.16)];
+  }
+
+  .node-label {
+    @apply rounded-full border border-white/10 bg-slate-950/80 px-3 py-1.5 text-left backdrop-blur;
+  }
+
+  .node-code {
+    @apply mr-2 text-[10px] uppercase tracking-[0.26em] text-slate-400;
+  }
+
+  .node-name {
+    @apply text-xs font-medium text-stone-100;
+  }
+
+  .node-marker-selected .node-dot {
+    @apply h-4 w-4 border-amber-100/40 bg-amber-200;
+  }
+
+  .node-marker-selected .node-label {
+    @apply border-amber-100/30;
+  }
+
+  .node-marker-exposed .node-dot {
+    @apply bg-[#8eb9d5];
+  }
+
+  .node-marker-blocked .node-dot {
+    @apply bg-[#f19b60];
+  }
+
+  .mini-panel {
+    @apply rounded-[24px] border border-white/10 bg-white/[0.03] p-4;
+  }
+
+  .impact-card {
+    @apply rounded-[24px] border border-white/10 bg-white/[0.04] p-4;
+  }
+
+  .rank-badge {
+    @apply mono inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-xs uppercase tracking-[0.24em] text-slate-300;
+  }
+
+  .driver-pill {
+    @apply rounded-full border border-white/10 bg-black/20 px-3 py-1.5 text-xs uppercase tracking-[0.2em] text-slate-300;
+  }
+
+  .channel-card {
+    @apply rounded-[24px] border border-white/10 bg-white/[0.04] p-5;
+  }
+
+  .chokepoint-card {
+    @apply rounded-[24px] border border-white/10 bg-white/[0.04] p-4 transition;
+  }
+
+  .chokepoint-card-active {
+    @apply border-amber-200/50 bg-[linear-gradient(135deg,rgba(164,112,68,0.16),rgba(9,20,31,0.55))];
+  }
+
+  .timeline-card {
+    @apply rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(12,23,33,0.8),rgba(8,16,24,0.74))] p-5 sm:p-6;
+  }
+
+  .timeline-chip {
+    @apply mono rounded-full border border-white/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-slate-300;
+  }
+}
+
+@media (max-width: 1024px) {
+  .theater-stage {
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 720px) {
+  .panel-title {
+    @apply text-3xl;
+  }
+
+  .theater-stage {
+    min-height: 320px;
+  }
+
+  .node-label {
+    @apply px-2 py-1;
+  }
+
+  .node-name {
+    @apply text-[11px];
+  }
+}

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="sea" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#122435" />
+      <stop offset="65%" stop-color="#08131f" />
+      <stop offset="100%" stop-color="#3f5d72" />
+    </linearGradient>
+    <linearGradient id="signal" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" stop-color="#d2b48c" />
+      <stop offset="100%" stop-color="#f29c62" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="url(#sea)" />
+  <path
+    d="M94 28c-8-5-18-8-30-8-28 0-46 18-46 44 0 27 19 44 46 44 12 0 22-3 30-8v-15c-7 6-16 10-27 10-18 0-31-12-31-31s13-31 31-31c11 0 20 4 27 10V28Z"
+    fill="url(#signal)"
+  />
+  <path
+    d="M76 44h18v12H76zM68 58h26v12H68zM76 72h18v12H76z"
+    fill="#d9e4ec"
+    opacity=".92"
+  />
+</svg>
