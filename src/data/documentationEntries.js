@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-031',
+    date: '2026-03-14',
+    label: 'Interactive map layers',
+    title: 'Added layered route map with clickable corridor insights and eligibility hierarchy',
+    summary:
+      'The simulator map now includes LNG, pipeline, major-port, and insurance-risk layers with click-to-explain storytelling tied to the selected country and chokepoint context.',
+    items: [
+      'Added toggleable route layers (LNG, pipelines, major ports, insurance zones) on top of existing chokepoint effects.',
+      'Added click interaction on layer features that explains what the node changes in the selected country in compact 1-3 line insights.',
+      'Added explicit active/inactive/ineligible visual hierarchy plus a quick primary-vs-secondary signal legend above the map.',
+    ],
+    review:
+      'Toggle each route layer, click different nodes, and verify insights update clearly while ineligible routes remain visually distinct.',
+  },
+  {
     id: 'log-030',
     date: '2026-03-14',
     label: 'Data coverage upgrade',
