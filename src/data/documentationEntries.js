@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-037',
+    date: '2026-03-14',
+    label: 'About page rewrite',
+    title: 'Simplified the About page to only essential website guidance',
+    summary:
+      'The About page now explains Continuumm in plain language with no extra product narrative: what it is, how to use it, what scores mean, and key limits.',
+    items: [
+      'Removed stack/roadmap-heavy sections and replaced them with a minimal website-oriented explanation.',
+      'Kept the content focused on user understanding: conflict selection, map reading, and country lens interpretation.',
+      'Clarified that outputs indicate modeled structural pressure, not guaranteed future outcomes.',
+    ],
+    review:
+      'Open About and verify the page is concise, simple, and limited to essential usage and interpretation guidance.',
+  },
+  {
     id: 'log-036',
     date: '2026-03-14',
     label: 'Map-first layout',
