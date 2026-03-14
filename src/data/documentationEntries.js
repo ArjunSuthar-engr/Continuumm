@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-038',
+    date: '2026-03-14',
+    label: 'Timeline metadata',
+    title: 'Added Git version metadata to documentation timeline entries',
+    summary:
+      'The timeline now shows Git release version and short commit reference alongside each milestone so users can map UI history to repository checkpoints quickly.',
+    items: [
+      'Added version chips (for example `v0.10.2`) to each timeline card in the Documentation page.',
+      'Added short commit chips where a matching checkpoint is available.',
+      'Preserved the existing milestone content while making Git traceability visible directly in the UI.',
+    ],
+    review:
+      'Open Documentation -> Timeline and verify each milestone now displays a Git version chip, with commit hash chips where available.',
+  },
+  {
     id: 'log-037',
     date: '2026-03-14',
     label: 'About page rewrite',

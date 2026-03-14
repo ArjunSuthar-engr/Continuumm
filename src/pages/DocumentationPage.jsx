@@ -5,6 +5,56 @@ import {
 } from '../data/projectContent'
 import { firebaseConfigured, firebaseProjectId } from '../lib/firebase'
 
+const timelineGitMetaByEntryId = {
+  'log-038': { version: 'v0.10.3', commit: 'pending' },
+  'log-037': { version: 'v0.10.2', commit: 'b6df3db' },
+  'log-036': { version: 'v0.10.1', commit: '638db32' },
+  'log-035': { version: 'v0.10.0', commit: '7669244' },
+  'log-034': { version: 'v0.9.2', commit: '5899960' },
+  'log-033': { version: 'v0.9.1', commit: '2dfde30' },
+  'log-032': { version: 'v0.9.0', commit: '9aa8227' },
+  'log-031': { version: 'v0.8.1', commit: 'c837519' },
+  'log-030': { version: 'v0.8.0', commit: '9d3e696' },
+  'log-029': { version: 'v0.7.0', commit: '868edec' },
+  'log-028': { version: 'v0.7.0', commit: '868edec' },
+  'log-027': { version: 'v0.6.0', commit: 'aff0215' },
+  'log-026': { version: 'v0.5.0', commit: 'ef154ba' },
+  'log-025': { version: 'v0.5.0', commit: 'ef154ba' },
+  'log-024': { version: 'v0.5.2', commit: '9985944' },
+  'log-023': { version: 'v0.5.1', commit: '1502f96' },
+  'log-022': { version: 'v0.5.1', commit: '1502f96' },
+  'log-021': { version: 'v0.5.1', commit: '1502f96' },
+  'log-020': { version: 'v0.5.1', commit: '1502f96' },
+  'log-019': { version: 'v0.5.1', commit: '1502f96' },
+  'log-018': { version: 'v0.5.1', commit: '1502f96' },
+  'log-017': { version: 'v0.5.1', commit: '1502f96' },
+  'log-016': { version: 'v0.5.1', commit: '1502f96' },
+  'log-015': { version: 'v0.5.1', commit: '1502f96' },
+  'log-014': { version: 'v0.5.1', commit: '1502f96' },
+  'log-013': { version: 'v0.5.1', commit: '1502f96' },
+  'log-012': { version: 'v0.5.1', commit: '1502f96' },
+  'log-011': { version: 'v0.5.0', commit: 'ef154ba' },
+  'log-010': { version: 'v0.4.0', commit: '75d5392' },
+  'log-009': { version: 'v0.3.0', commit: '8d298e6' },
+  'log-008': { version: 'v0.2.0', commit: '262ecf7' },
+  'log-007': { version: 'v0.1.0', commit: '9a3dd96' },
+  'log-006': { version: 'v0.1.0', commit: '9a3dd96' },
+  'log-005': { version: 'v0.1.0', commit: '9a3dd96' },
+  'log-004': { version: 'v0.1.0', commit: '9a3dd96' },
+  'log-003': { version: 'v0.1.0', commit: '9a3dd96' },
+  'log-002': { version: 'v0.1.0', commit: '9a3dd96' },
+  'log-001': { version: 'pre-v0.1.0', commit: null },
+}
+
+function getEntryGitMeta(entryId) {
+  return (
+    timelineGitMetaByEntryId[entryId] ?? {
+      version: 'unmapped',
+      commit: null,
+    }
+  )
+}
+
 function DocumentationPage() {
   return (
     <div className="space-y-6">
@@ -168,13 +218,20 @@ function DocumentationPage() {
         </div>
 
         <div className="space-y-4">
-          {documentationEntries.map((entry) => (
+          {documentationEntries.map((entry) => {
+            const gitMeta = getEntryGitMeta(entry.id)
+
+            return (
             <article key={entry.id} className="timeline-card">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="max-w-3xl">
                   <div className="flex flex-wrap items-center gap-3">
                     <span className="timeline-chip">{entry.date}</span>
                     <span className="timeline-chip">{entry.label}</span>
+                    <span className="timeline-chip">{gitMeta.version}</span>
+                    {gitMeta.commit ? (
+                      <span className="timeline-chip">#{gitMeta.commit}</span>
+                    ) : null}
                   </div>
                   <h3 className="mt-4 text-3xl text-stone-100">{entry.title}</h3>
                   <p className="mt-4 text-sm leading-7 text-slate-300">
@@ -197,7 +254,8 @@ function DocumentationPage() {
                 ))}
               </div>
             </article>
-          ))}
+            )
+          })}
         </div>
       </section>
     </div>
