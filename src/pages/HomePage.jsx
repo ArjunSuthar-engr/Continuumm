@@ -1,29 +1,6 @@
 import { Link } from 'react-router-dom'
+import { softwareModules } from '../data/softwareModules'
 import { defaultScenarioConfig, simulateConflict } from '../features/simulator'
-
-const softwareCards = [
-  {
-    id: 'spillover-core',
-    title: 'Spillover Core',
-    description:
-      'Model second-order impact from one conflict pair into third-country economic and strategic pressure.',
-    index: '/0.1',
-  },
-  {
-    id: 'route-pressure',
-    title: 'Route Pressure',
-    description:
-      'Track chokepoint congestion risk across canals and straits that amplify shipping and energy shock.',
-    index: '/0.2',
-  },
-  {
-    id: 'country-brief',
-    title: 'Country Brief',
-    description:
-      'Inspect why one selected country moves, with transparent channel-level pressure drivers.',
-    index: '/0.3',
-  },
-]
 
 function HomePage() {
   const snapshot = simulateConflict(defaultScenarioConfig)
@@ -57,14 +34,20 @@ function HomePage() {
         </div>
 
         <div className="software-grid">
-          {softwareCards.map((card) => (
-            <article key={card.id} className="software-card">
+          {softwareModules.map((card) => (
+            <Link key={card.id} to={card.path} className="software-card software-link-card">
               <div className="software-copy">
-                <p>{card.description}</p>
                 <span>{card.index}</span>
+                <p>{card.description}</p>
               </div>
-              <h3>{card.title}</h3>
-            </article>
+
+              <div className="software-link-heading">
+                <h3>{card.title}</h3>
+                <span className="software-link-arrow" aria-hidden="true">
+                  {'->'}
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
       </section>

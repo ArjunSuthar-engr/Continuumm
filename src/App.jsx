@@ -9,6 +9,7 @@ const DocumentationPage = lazy(() => import('./pages/DocumentationPage'))
 const HomePage = lazy(() => import('./pages/HomePage'))
 const MethodologyPage = lazy(() => import('./pages/MethodologyPage'))
 const SimulatorPage = lazy(() => import('./pages/SimulatorPage'))
+const SoftwareModulePage = lazy(() => import('./pages/SoftwareModulePage'))
 
 function LazyPage(props) {
   const Component = props.component
@@ -40,6 +41,10 @@ function App() {
             element={<LazyPage component={DocumentationPage} />}
           />
           <Route path="/about" element={<LazyPage component={AboutPage} />} />
+          <Route
+            path="/software/:softwareId"
+            element={<LazyPage component={SoftwareModulePage} />}
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

@@ -6,6 +6,66 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-042',
+    date: '2026-03-14',
+    label: 'Home alignment polish',
+    title: 'Moved Home software module names to the far-right edge',
+    summary:
+      'The right side of the Home software rows now anchors module names at the far-right edge for a clearer scan line, matching the requested alignment.',
+    items: [
+      'Adjusted Home software row heading alignment to rightmost positioning.',
+      'Kept the simplified card content from the previous pass (no mini chips or spark visuals).',
+      'Retuned mobile behavior so heading alignment remains consistent while keeping readable type scale.',
+    ],
+    review:
+      'Open Home -> Our Software and verify Spillover Core / Route Pressure / Country Brief now sit on the far-right edge of each row.',
+  },
+  {
+    id: 'log-041',
+    date: '2026-03-14',
+    label: 'Info hints + home simplification',
+    title: 'Added information icons on software pages and simplified Home software cards',
+    summary:
+      'Each software module page now includes info icons with tooltips so users can quickly understand what each visual block means, and Home software rows were simplified to keep only the module names on the right side.',
+    items: [
+      'Added reusable info hint icons (tooltip on hover/focus) across canvas, metrics, gauge, and chart sections in all three software pages.',
+      'Removed Home card mini-metric and spark visuals (for example Critical lanes / Impact lenses chips and small graph bars).',
+      'Kept Home cards focused on the three module names on the right side for cleaner scanning.',
+    ],
+    review:
+      'Open Home and verify the right side shows only module names, then open each software page and hover/focus the info icons to confirm tooltip clarity.',
+  },
+  {
+    id: 'log-040',
+    date: '2026-03-14',
+    label: 'Visual-first software pages',
+    title: 'Converted software deep-dive pages to graphics + stats with minimal copy',
+    summary:
+      'The three Home software lanes now prioritize visuals over reading: graph canvases, numeric tiles, radial score rings, and bar-chart data views replaced long explanatory blocks.',
+    items: [
+      'Rebuilt `/software/*` pages into visual dashboards with node-link canvases, metric cards, and chart panels.',
+      'Added data-backed stat views per module using simulator outputs, route transit values, and lens score profiles.',
+      'Upgraded Home software cards with in-card metrics and spark visuals so users get immediate signal before clicking.',
+    ],
+    review:
+      'Open Home -> Our Software and confirm each card and module page now feels visual-first, with minimal reading and clear stats at first glance.',
+  },
+  {
+    id: 'log-039',
+    date: '2026-03-14',
+    label: 'Software deep dives',
+    title: 'Connected Home software cards to dedicated immersive explainer pages',
+    summary:
+      'Each card under Home -> Our Software now opens a dedicated module page with an immersive layout that explains purpose, operating flow, and practical outcomes in a clear visual format.',
+    items: [
+      'Added a route-backed software-module system and connected all three Home software cards to their own pages.',
+      'Introduced immersive module pages with signal boards, graphical flow sections, and outcome cards for Spillover Core, Route Pressure, and Country Brief.',
+      'Kept module navigation circular by adding adjacent-module links and direct simulator access from each page.',
+    ],
+    review:
+      'From Home -> Our Software, click each card and verify it opens a dedicated page with clear module explanation, immersive visual flow, and working navigation.',
+  },
+  {
     id: 'log-038',
     date: '2026-03-14',
     label: 'Timeline metadata',

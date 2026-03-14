@@ -6,6 +6,10 @@ import {
 import { firebaseConfigured, firebaseProjectId } from '../lib/firebase'
 
 const timelineGitMetaByEntryId = {
+  'log-042': { version: 'v0.10.4', commit: 'pending' },
+  'log-041': { version: 'v0.10.4', commit: 'pending' },
+  'log-040': { version: 'v0.10.4', commit: 'pending' },
+  'log-039': { version: 'v0.10.4', commit: 'pending' },
   'log-038': { version: 'v0.10.3', commit: 'pending' },
   'log-037': { version: 'v0.10.2', commit: 'b6df3db' },
   'log-036': { version: 'v0.10.1', commit: '638db32' },
