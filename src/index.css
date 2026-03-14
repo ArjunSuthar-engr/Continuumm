@@ -540,6 +540,16 @@
     color: var(--theme-text-base);
   }
 
+  .footer-copy-block {
+    @apply space-y-2;
+  }
+
+  .footer-disclaimer {
+    @apply text-xs leading-6;
+    color: var(--theme-text-faint);
+    max-width: 56rem;
+  }
+
   .footer-nav {
     @apply flex flex-wrap gap-2;
   }

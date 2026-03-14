@@ -229,10 +229,17 @@ function SiteLayout() {
 
         <footer className="site-footer">
           <div className="footer-grid">
-            <p className="footer-copy">
-              Continuumm maps structural spillover across trade, energy, and
-              strategic chokepoints.
-            </p>
+            <div className="footer-copy-block">
+              <p className="footer-copy">
+                Continuumm maps structural spillover across trade, energy, and
+                strategic chokepoints.
+              </p>
+              <p className="footer-disclaimer">
+                Model outputs blend observed, inferred, and modelled inputs and
+                are not fully synced in real time. Verify with primary sources
+                before making decisions.
+              </p>
+            </div>
             <div className="footer-nav">
               {navItems.map((item) => (
                 <NavLink

@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-046',
+    date: '2026-03-14',
+    label: 'Data warning',
+    title: 'Added a global footer disclaimer about non-real-time model sync',
+    summary:
+      'The shared footer now explicitly states that outputs blend observed, inferred, and modelled data and are not fully synced in real time, with a prompt to verify against primary sources before decisions.',
+    items: [
+      'Added a second footer line that communicates non-real-time sync limits.',
+      'Kept the disclaimer global via shared layout so it appears on all pages.',
+      'Styled the disclaimer as subdued supporting text to avoid visual clutter.',
+    ],
+    review:
+      'Open any page and verify the footer shows the non-real-time caution line under the core platform statement.',
+  },
+  {
     id: 'log-045',
     date: '2026-03-14',
     label: 'Header interaction polish',
