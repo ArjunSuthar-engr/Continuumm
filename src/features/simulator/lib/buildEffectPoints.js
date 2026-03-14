@@ -147,6 +147,9 @@ export function buildEffectPoints({
             ? 1.08
             : 1
       const controlScore = control.effectiveScore * 100
+      const controlEffectiveScorePct = Math.round(control.effectiveScore * 100)
+      const controlThresholdPct = Math.round(control.threshold * 100)
+      const controlMarginPct = controlEffectiveScorePct - controlThresholdPct
       const warLinkExposure =
         (chokepoint.exposures[aggressorId] ?? 0) +
         (chokepoint.exposures[defenderId] ?? 0)
@@ -214,6 +217,9 @@ export function buildEffectPoints({
         controlBy: control.controllerName,
         controlMode: control.mode,
         controlNarrative: control.narrative,
+        controlEffectiveScorePct,
+        controlThresholdPct,
+        controlMarginPct,
         transitMbd: control.transitMbd,
         whyLine: `${selectedCountry.name} has ${modelledImportShare}% effective route dependence through ${chokepoint.name} (raw ${routeShare}%, pipeline bypass ${pipelineBypassPct}%), and ${control.controllerName} can disrupt this corridor under ${conflictMode.label.toLowerCase()} over ${duration.label.toLowerCase()}.`,
       }

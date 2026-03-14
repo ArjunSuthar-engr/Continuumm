@@ -267,6 +267,99 @@ runTest('impact lens model exposes highest selector and channel-specific views',
   assert.equal(Boolean(countryEffects.impactLenses.oil), true)
 })
 
+runTest('reason contract exposes ranked chokepoint evidence per lens', () => {
+  const blockedChokepointIds = deriveConflictChokepoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+  })
+  const scenario = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    blockedChokepointIds,
+  })
+  const effectPoints = buildEffectPoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    selectedCountryId: 'india',
+    blockedChokepointIds,
+  })
+  const countryEffects = buildCountryEffects({
+    scenario,
+    effectPoints,
+    selectedCountryId: 'india',
+    selectedEffectPointId: effectPoints[0]?.id ?? null,
+  })
+
+  const oilReasons = countryEffects.reasonContributionsByLens.oil
+
+  assert.equal(countryEffects.reasonContractVersion, 1)
+  assert.equal(Array.isArray(oilReasons), true)
+  assert.equal(oilReasons.length > 0, true)
+  assert.equal(countryEffects.impactLenses.oil.reasonCount, oilReasons.length)
+  assert.equal(
+    oilReasons.every(
+      (reason) =>
+        typeof reason.chokepointId === 'string' &&
+        typeof reason.contributionPct === 'number' &&
+        typeof reason.controlEffectiveScorePct === 'number' &&
+        typeof reason.controlThresholdPct === 'number',
+    ),
+    true,
+  )
+  assert.equal(
+    oilReasons[0].contributionPct >= (oilReasons[1]?.contributionPct ?? 0),
+    true,
+  )
+})
+
+runTest('reason contract falls back cleanly when no chokepoint is disruptable', () => {
+  const blockedChokepointIds = deriveConflictChokepoints({
+    aggressorId: 'india',
+    defenderId: 'germany',
+    conflictModeId: 'sanctions',
+    durationId: '2w',
+    intensity: 62,
+  })
+  const scenario = simulateConflict({
+    aggressorId: 'india',
+    defenderId: 'germany',
+    focusModeId: 'balanced',
+    conflictModeId: 'sanctions',
+    durationId: '2w',
+    intensity: 62,
+    blockedChokepointIds,
+  })
+  const effectPoints = buildEffectPoints({
+    aggressorId: 'india',
+    defenderId: 'germany',
+    conflictModeId: 'sanctions',
+    durationId: '2w',
+    intensity: 62,
+    selectedCountryId: 'japan',
+    blockedChokepointIds,
+  })
+  const countryEffects = buildCountryEffects({
+    scenario,
+    effectPoints,
+    selectedCountryId: 'japan',
+    selectedEffectPointId: null,
+  })
+
+  assert.equal(effectPoints.length, 0)
+  assert.equal(countryEffects.impactLenses.highest.reasonCount, 0)
+  assert.equal(countryEffects.impactLenses.highest.reasons.length, 0)
+})
+
 runTest('india electricity effect remains lower than retail fuel effect under hormuz stress', () => {
   const blockedChokepointIds = deriveConflictChokepoints({
     aggressorId: 'israel',

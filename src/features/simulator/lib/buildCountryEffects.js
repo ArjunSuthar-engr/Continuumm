@@ -172,6 +172,187 @@ function buildEffectItem({
   }
 }
 
+const lensOutcomeIds = {
+  oil: ['crude', 'lng', 'energy', 'fuel', 'gasoline'],
+  petrol: ['gasoline', 'fuel', 'crude'],
+  freight: ['freight', 'delivery', 'insurance', 'detour', 'black-sea', 'grain'],
+  inflation: ['gasoline', 'fuel', 'freight', 'delivery', 'insurance', 'detour'],
+  electricity: ['lng', 'energy', 'fuel', 'gasoline'],
+  industry: ['freight', 'delivery', 'components', 'insurance', 'detour', 'black-sea'],
+}
+
+function averageOutcomeScore(point, outcomeIds, fallbackScale = 0.7) {
+  const matched = point.outcomes.filter((outcome) => outcomeIds.includes(outcome.id))
+
+  if (!matched.length) {
+    return clamp(Math.round(point.score * fallbackScale), 6, 98)
+  }
+
+  return clamp(
+    Math.round(average(matched.map((outcome) => outcome.score))),
+    6,
+    98,
+  )
+}
+
+function computeLensSignal(point, lensId) {
+  if (lensId === 'inflation') {
+    const fuelSignal = averageOutcomeScore(point, lensOutcomeIds.petrol, 0.72)
+    const freightSignal = averageOutcomeScore(point, lensOutcomeIds.freight, 0.68)
+    return clamp(Math.round(fuelSignal * 0.56 + freightSignal * 0.44), 6, 98)
+  }
+
+  if (lensId === 'industry') {
+    const freightSignal = averageOutcomeScore(point, lensOutcomeIds.freight, 0.7)
+    const componentSignal = averageOutcomeScore(point, ['components', 'delivery'], 0.66)
+    return clamp(Math.round(freightSignal * 0.64 + componentSignal * 0.36), 6, 98)
+  }
+
+  if (lensId === 'electricity') {
+    const energySignal = averageOutcomeScore(point, lensOutcomeIds.electricity, 0.62)
+    return clamp(Math.round(energySignal * 0.78 + point.score * 0.22), 6, 98)
+  }
+
+  return averageOutcomeScore(point, lensOutcomeIds[lensId] ?? [], 0.68)
+}
+
+function buildReasonContributions({ lensId, effectPoints }) {
+  if (!effectPoints.length) {
+    return []
+  }
+
+  const rawReasonRows = effectPoints.map((point) => {
+    const routeDependencePct = clamp(Math.round(point.modelledImportShare ?? 0), 0, 100)
+    const rawRouteSharePct = clamp(Math.round(point.routeShareRawPct ?? routeDependencePct), 0, 100)
+    const controlEffectiveScorePct = clamp(
+      Math.round(point.controlEffectiveScorePct ?? 0),
+      0,
+      100,
+    )
+    const controlThresholdPct = clamp(
+      Math.round(point.controlThresholdPct ?? 0),
+      0,
+      100,
+    )
+    const controlMarginPct = Math.round(
+      point.controlMarginPct ?? controlEffectiveScorePct - controlThresholdPct,
+    )
+    const lensSignal = computeLensSignal(point, lensId)
+    const bypassPct = clamp(Math.round(point.pipelineBypassPct ?? 0), 0, 100)
+    const lngImportExposurePct = clamp(Math.round(point.lngImportExposurePct ?? 0), 0, 100)
+    const portConcentrationScore = clamp(
+      Number((point.portConcentrationScore ?? 0.5).toFixed(2)),
+      0,
+      1,
+    )
+    const throughputMbd = Number(point.transitMbd ?? 0)
+    const bypassDrag = clamp(1 - bypassPct / 100, 0.32, 1)
+    const controlFactor = clamp(
+      controlEffectiveScorePct / 100 + controlMarginPct / 240,
+      0.2,
+      1.42,
+    )
+    const structuralFactor = clamp(
+      1 + portConcentrationScore * 0.22 + (lngImportExposurePct / 100) * 0.18,
+      0.84,
+      1.36,
+    )
+    const throughputFactor = clamp(0.72 + throughputMbd / 46, 0.72, 1.32)
+    const rawContribution =
+      (routeDependencePct / 100) *
+      (lensSignal / 100) *
+      bypassDrag *
+      controlFactor *
+      structuralFactor *
+      throughputFactor
+    const contributionScore = clamp(
+      Math.round(
+        lensSignal * 0.5 +
+          routeDependencePct * 0.2 +
+          controlEffectiveScorePct * 0.15 +
+          (point.score ?? 0) * 0.15,
+      ),
+      8,
+      98,
+    )
+
+    return {
+      id: `${lensId}-${point.id}`,
+      lensId,
+      chokepointId: point.id,
+      chokepointName: point.name,
+      contributionScore,
+      rawContribution,
+      routeDependencePct,
+      rawRouteSharePct,
+      pipelineBypassPct: bypassPct,
+      lngImportExposurePct,
+      portConcentrationScore,
+      controlBy: point.controlBy,
+      controlMode: point.controlMode,
+      controlEffectiveScorePct,
+      controlThresholdPct,
+      controlMarginPct,
+      chokepointScore: point.score,
+      pressureBand: point.band,
+      transitMbd: throughputMbd,
+      dataBasis: point.dataBasis,
+      dataSource: point.dataSource,
+      dataAsOf: point.dataAsOf,
+      controlNarrative: point.controlNarrative,
+      outcomes: point.outcomes,
+    }
+  })
+
+  const totalRawContribution =
+    rawReasonRows.reduce((sum, reason) => sum + reason.rawContribution, 0) || 1
+
+  return rawReasonRows
+    .map((reason) => {
+      const contributionPct = clamp(
+        Math.round((reason.rawContribution / totalRawContribution) * 100),
+        1,
+        100,
+      )
+      const topSignals = reason.outcomes
+        .slice()
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 2)
+        .map((outcome) => `${outcome.label} ${outcome.score}/100`)
+        .join(' | ')
+
+      return {
+        id: reason.id,
+        lensId: reason.lensId,
+        chokepointId: reason.chokepointId,
+        chokepointName: reason.chokepointName,
+        contributionPct,
+        contributionScore: reason.contributionScore,
+        routeDependencePct: reason.routeDependencePct,
+        rawRouteSharePct: reason.rawRouteSharePct,
+        pipelineBypassPct: reason.pipelineBypassPct,
+        lngImportExposurePct: reason.lngImportExposurePct,
+        portConcentrationScore: reason.portConcentrationScore,
+        controlBy: reason.controlBy,
+        controlMode: reason.controlMode,
+        controlEffectiveScorePct: reason.controlEffectiveScorePct,
+        controlThresholdPct: reason.controlThresholdPct,
+        controlMarginPct: reason.controlMarginPct,
+        chokepointScore: reason.chokepointScore,
+        pressureBand: reason.pressureBand,
+        transitMbd: reason.transitMbd,
+        dataBasis: reason.dataBasis,
+        dataSource: reason.dataSource,
+        dataAsOf: reason.dataAsOf,
+        controlNarrative: reason.controlNarrative,
+        summary: `${reason.chokepointName} drives ${contributionPct}% of this lens pressure (effective route dependence ${reason.routeDependencePct}%, control ${reason.controlEffectiveScorePct}/100 vs threshold ${reason.controlThresholdPct}/100).`,
+        evidenceLine: `Raw route share ${reason.rawRouteSharePct}% | pipeline bypass ${reason.pipelineBypassPct}% | LNG exposure ${reason.lngImportExposurePct}% | throughput ${reason.transitMbd.toFixed(1)} mb/d`,
+        signalLine: topSignals,
+      }
+    })
+    .sort((a, b) => b.contributionPct - a.contributionPct)
+}
+
 function buildLensDetail({
   id,
   label,
@@ -179,7 +360,9 @@ function buildLensDetail({
   effect,
   selectedPoint,
   noShockLine,
+  reasons,
 }) {
+  const topReason = reasons[0] ?? null
   const pointDriverLine = selectedPoint
     ? `${selectedPoint.name}: modeled route exposure ${selectedPoint.modelledImportShare}% for this country.`
     : noShockLine
@@ -193,7 +376,10 @@ function buildLensDetail({
     dataBasis: effect.dataBasis,
     dataSource: effect.dataSource,
     verdict: `${selectedCountryName}: ${label.toLowerCase()} shows ${effect.effect} (${effect.score}/100, ${effect.band.toLowerCase()}).`,
-    why: [effect.summary, pointDriverLine],
+    why: [effect.summary, topReason?.summary ?? pointDriverLine],
+    reasonCount: reasons.length,
+    reasons,
+    topReason,
   }
 }
 
@@ -473,6 +659,15 @@ export function buildCountryEffects({
       effectId: 'secondary-manufacturing',
     },
   ]
+  const reasonContributionsByLens = Object.fromEntries(
+    lensDefinitions.map((lens) => [
+      lens.id,
+      buildReasonContributions({
+        lensId: lens.id,
+        effectPoints,
+      }),
+    ]),
+  )
   const selectableLenses = lensDefinitions
     .map((lens) => {
       const effect = effectById[lens.effectId]
@@ -488,6 +683,7 @@ export function buildCountryEffects({
         effect,
         selectedPoint,
         noShockLine,
+        reasons: reasonContributionsByLens[lens.id] ?? [],
       })
     })
     .filter(Boolean)
@@ -524,8 +720,13 @@ export function buildCountryEffects({
       dataSource: 'No currently disruptable chokepoint in this scenario.',
       verdict: `${selectedCountryName}: no active route-control shock detected in this setup.`,
       why: [noShockLine],
+      reasonCount: 0,
+      reasons: [],
+      topReason: null,
     }
   }
+
+  reasonContributionsByLens.highest = impactLenses.highest.reasons ?? []
 
   return {
     oneLineSummary,
@@ -536,6 +737,8 @@ export function buildCountryEffects({
     impactLensOptions,
     impactLenses,
     defaultImpactLensId: 'highest',
+    reasonContractVersion: 1,
+    reasonContributionsByLens,
     dataAsOf: countrySecondarySnapshot.asOf,
     dataSources: countrySecondarySnapshot.sources,
   }

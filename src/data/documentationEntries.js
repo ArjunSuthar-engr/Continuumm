@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-047',
+    date: '2026-03-14',
+    label: 'Reason engine',
+    title: 'Added lens-level reason contribution contract for chokepoint causality',
+    summary:
+      'The simulator model now computes ranked chokepoint reason contributions for each impact lens (oil, petrol/diesel, freight, inflation, electricity, industry), including control-threshold evidence and route dependence context.',
+    items: [
+      'Extended effect-point metadata with control evidence fields (effective score, threshold, and margin).',
+      'Added a new reason contribution engine that scores and ranks chokepoint causes per selected impact lens.',
+      'Extended country-effects output contract with reason maps, top-reason pointers, and deterministic regression tests.',
+    ],
+    review:
+      'Select a war pair and country, then verify each impact lens has structured ranked reasons available in model output (UI wiring follows in next slice).',
+  },
+  {
     id: 'log-046',
     date: '2026-03-14',
     label: 'Data warning',
