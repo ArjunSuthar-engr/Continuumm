@@ -1,3 +1,17 @@
+const effectOptionLabels = {
+  highest: 'Highest impact now',
+  oil: 'Oil import costs may rise',
+  petrol: 'Petrol and diesel prices may rise',
+  freight: 'Freight and shipping costs may rise',
+  inflation: 'Inflation may rise',
+  electricity: 'Electricity tariffs may rise',
+  industry: 'Industry and logistics stress may rise',
+}
+
+function getEffectOptionLabel(optionId, fallbackLabel) {
+  return effectOptionLabels[optionId] ?? fallbackLabel
+}
+
 function CountryImpactPanel({
   scenario,
   effectPoints,
@@ -39,10 +53,34 @@ function CountryImpactPanel({
     ? selectedImpactLensId
     : fallbackLensId
   const activeLens = impactLenses[activeLensId]
+  const effectOptions = impactLensOptions.map((option) => {
+    const lens = impactLenses[option.id]
+
+    return {
+      id: option.id,
+      label: getEffectOptionLabel(option.id, option.label),
+      score: lens?.score ?? null,
+      reasonCount: lens?.reasonCount ?? 0,
+    }
+  })
+  const activeReasons = activeLens?.reasons ?? []
+  const selectedReason =
+    activeReasons.find((reason) => reason.chokepointId === activeEffectPoint?.id) ??
+    activeReasons[0] ??
+    null
   const compactEffects = [
     ...(countryEffects?.primaryEffects ?? []),
     ...(countryEffects?.secondaryEffects ?? []),
   ].sort((a, b) => b.score - a.score)
+
+  function handleEffectOptionSelect(nextLensId) {
+    onImpactLensSelect(nextLensId)
+    const topReason = impactLenses[nextLensId]?.topReason
+
+    if (topReason?.chokepointId) {
+      onEffectPointSelect(topReason.chokepointId)
+    }
+  }
 
   return (
     <aside className="panel">
@@ -52,7 +90,7 @@ function CountryImpactPanel({
           <h2 className="panel-title">Impact on one country</h2>
         </div>
         <p className="panel-copy">
-          Pick one lens at a time to read only the impact channel you care about.
+          Pick one effect and immediately see the chokepoints that drive it.
         </p>
       </div>
 
@@ -76,33 +114,47 @@ function CountryImpactPanel({
                 ))}
               </select>
             </div>
+          </div>
 
-            <div>
-              <label className="field-label" htmlFor="impact-lens">
-                Impact lens
-              </label>
-              <select
-                id="impact-lens"
-                className="field-control"
-                value={activeLensId}
-                onChange={(event) => onImpactLensSelect(event.target.value)}
+          <p className="eyebrow mt-4">Effect options</p>
+          <p className="impact-options-copy mt-2">
+            Choose one outcome channel. Then click any reason below to inspect why it
+            may rise.
+          </p>
+
+          <div className="impact-effect-option-grid mt-3">
+            {effectOptions.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={`impact-effect-option ${
+                  activeLensId === option.id ? 'impact-effect-option-active' : ''
+                }`}
+                onClick={() => handleEffectOptionSelect(option.id)}
               >
-                {impactLensOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <span className="impact-effect-option-copy">
+                  <strong>{option.label}</strong>
+                  <span>
+                    {option.reasonCount > 0
+                      ? `${option.reasonCount} route reasons`
+                      : 'No active route reason'}
+                  </span>
+                </span>
+                <span className="impact-effect-option-score">
+                  {option.score ?? '--'}
+                  <small>/100</small>
+                </span>
+              </button>
+            ))}
           </div>
         </article>
 
         <article className="impact-card">
           <div className="impact-lens-head">
             <div>
-              <p className="eyebrow">Selected lens</p>
+              <p className="eyebrow">Selected effect</p>
               <h3 className="impact-lens-title">
-                {activeLens?.label ?? 'Highest impact'}
+                {getEffectOptionLabel(activeLensId, activeLens?.label ?? 'Highest impact')}
               </h3>
             </div>
             <div className="impact-lens-score">
@@ -120,6 +172,45 @@ function CountryImpactPanel({
               </p>
             ))}
           </div>
+
+          <p className="eyebrow mt-4">Why this may rise</p>
+          {hasEffectPoints && activeReasons.length > 0 ? (
+            <div className="impact-reason-list mt-3">
+              {activeReasons.map((reason) => {
+                const isReasonActive = reason.chokepointId === selectedReason?.chokepointId
+
+                return (
+                  <button
+                    key={reason.id}
+                    type="button"
+                    className={`impact-reason-button ${
+                      isReasonActive ? 'impact-reason-button-active' : ''
+                    }`}
+                    onClick={() => onEffectPointSelect(reason.chokepointId)}
+                  >
+                    <div className="impact-reason-head">
+                      <strong className="impact-reason-title">{reason.chokepointName}</strong>
+                      <span className="impact-reason-share">
+                        {reason.contributionPct}% of pressure
+                      </span>
+                    </div>
+                    <p className="impact-reason-line">{reason.summary}</p>
+                    <p className="impact-reason-line">{reason.evidenceLine}</p>
+                    <p className="impact-reason-meta">
+                      Control {reason.controlEffectiveScorePct}/100 vs threshold{' '}
+                      {reason.controlThresholdPct}/100 | {reason.controlBy} |{' '}
+                      {reason.pressureBand} pressure
+                    </p>
+                  </button>
+                )
+              })}
+            </div>
+          ) : (
+            <p className="impact-driver-line mt-3">
+              No route-control reason is active for this effect in the current war
+              setup.
+            </p>
+          )}
 
           <div className="impact-meta-row mt-3">
             <span className="impact-meta-pill">
@@ -141,25 +232,9 @@ function CountryImpactPanel({
         </article>
 
         <article className="impact-card">
-          <p className="eyebrow">Chokepoint focus</p>
+          <p className="eyebrow">Selected effect point</p>
           {hasEffectPoints ? (
             <>
-              <label className="field-label mt-3 block" htmlFor="effect-point">
-                Effect point
-              </label>
-              <select
-                id="effect-point"
-                className="field-control"
-                value={activeEffectPoint?.id ?? ''}
-                onChange={(event) => onEffectPointSelect(event.target.value)}
-              >
-                {effectPoints.map((point) => (
-                  <option key={point.id} value={point.id}>
-                    {point.name} ({point.band})
-                  </option>
-                ))}
-              </select>
-
               <h3 className="mt-3 text-xl text-stone-100">{activeEffectPoint?.name}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-300">
                 {activeEffectPoint?.whyLine}
