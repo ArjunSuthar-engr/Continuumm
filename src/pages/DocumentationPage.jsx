@@ -6,6 +6,9 @@ import {
 import { firebaseConfigured, firebaseProjectId } from '../lib/firebase'
 
 const timelineGitMetaByEntryId = {
+  'log-045': { version: 'v0.10.5', commit: 'pending' },
+  'log-044': { version: 'v0.10.5', commit: 'pending' },
+  'log-043': { version: 'v0.10.5', commit: 'pending' },
   'log-042': { version: 'v0.10.4', commit: 'pending' },
   'log-041': { version: 'v0.10.4', commit: 'pending' },
   'log-040': { version: 'v0.10.4', commit: 'pending' },
@@ -112,7 +115,7 @@ function DocumentationPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <article className="story-card">
               <p className="eyebrow">Public page source</p>
-              <h3 className="mt-3 text-2xl text-stone-100">
+              <h3 className="doc-path mt-3 text-2xl text-stone-100">
                 `src/data/documentationEntries.js`
               </h3>
               <p className="mt-3 text-sm leading-6 text-slate-300">
@@ -122,7 +125,7 @@ function DocumentationPage() {
             </article>
             <article className="story-card">
               <p className="eyebrow">Local-only notes</p>
-              <h3 className="mt-3 text-2xl text-stone-100">`.continuumm/`</h3>
+              <h3 className="doc-path mt-3 text-2xl text-stone-100">`.continuumm/`</h3>
               <p className="mt-3 text-sm leading-6 text-slate-300">
                 Keep detailed work logs, roadmap state, and review notes here
                 without exposing them to the public repo.
@@ -224,6 +227,10 @@ function DocumentationPage() {
         <div className="space-y-4">
           {documentationEntries.map((entry) => {
             const gitMeta = getEntryGitMeta(entry.id)
+            const commitLabel =
+              gitMeta.commit && gitMeta.commit !== 'pending'
+                ? gitMeta.commit
+                : null
 
             return (
             <article key={entry.id} className="timeline-card">
@@ -233,8 +240,8 @@ function DocumentationPage() {
                     <span className="timeline-chip">{entry.date}</span>
                     <span className="timeline-chip">{entry.label}</span>
                     <span className="timeline-chip">{gitMeta.version}</span>
-                    {gitMeta.commit ? (
-                      <span className="timeline-chip">#{gitMeta.commit}</span>
+                    {commitLabel ? (
+                      <span className="timeline-chip">#{commitLabel}</span>
                     ) : null}
                   </div>
                   <h3 className="mt-4 text-3xl text-stone-100">{entry.title}</h3>

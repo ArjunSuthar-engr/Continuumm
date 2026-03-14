@@ -6,6 +6,51 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-045',
+    date: '2026-03-14',
+    label: 'Header interaction polish',
+    title: 'Reworked hamburger interaction to a left-expanding header rail with stable mobile behavior',
+    summary:
+      'The hamburger menu now expands leftward inside the header so it no longer overlaps Simulation/Light actions, and mobile menu behavior remains visible after downward scroll.',
+    items: [
+      'Changed desktop header menu from a floating overlay to an inline left-expanding command rail.',
+      'Added close behavior for outside click and Escape key while preserving route navigation behavior.',
+      'Adjusted scroll/menu interaction so opening the menu keeps the header visible on mobile after scrolling.',
+    ],
+    review:
+      'On desktop, click hamburger and verify options expand left without covering other header actions. On mobile, scroll down and confirm hamburger still opens reliably.',
+  },
+  {
+    id: 'log-044',
+    date: '2026-03-14',
+    label: 'Timeline polish',
+    title: 'Removed placeholder pending commit chips from Documentation timeline',
+    summary:
+      'Documentation timeline now hides unresolved commit placeholders, so only real commit hashes are shown and `#pending` no longer appears in the UI.',
+    items: [
+      'Updated timeline chip rendering to show commit hash chips only when a real hash exists.',
+      'Kept version chips visible so release progression remains readable.',
+      'Preserved existing mapped real commit chips for earlier milestones.',
+    ],
+    review:
+      'Open Documentation timeline and verify that no `#pending` tags are visible while mapped real commit chips still appear.',
+  },
+  {
+    id: 'log-043',
+    date: '2026-03-14',
+    label: 'Overflow fix',
+    title: 'Fixed text overflow on Simulator horizon cards and Documentation path cards',
+    summary:
+      'Resolved overflow issues by making simulator horizon cards responsive to narrow panel widths and allowing long documentation path strings to wrap safely inside their cards.',
+    items: [
+      'Changed horizon cards from fixed 3-column layout to responsive auto-fit columns.',
+      'Updated horizon header/window styles to stack and wrap cleanly in narrow widths.',
+      'Added safe wrapping rules for long code/path headings in documentation cards.',
+    ],
+    review:
+      'Check Simulator -> Show details -> Horizon read and Documentation -> Source files to verify text no longer overflows or overlaps.',
+  },
+  {
     id: 'log-042',
     date: '2026-03-14',
     label: 'Home alignment polish',

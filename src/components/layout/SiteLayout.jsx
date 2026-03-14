@@ -36,17 +36,29 @@ function SiteLayout() {
   const [headerVisible, setHeaderVisible] = useState(true)
   const { theme, toggleTheme } = useTheme()
   const lastScrollY = useRef(0)
+  const menuOpenRef = useRef(false)
+  const menuRailRef = useRef(null)
+  const menuButtonRef = useRef(null)
+
+  useEffect(() => {
+    menuOpenRef.current = menuOpen
+  }, [menuOpen])
 
   useEffect(() => {
     function handleScroll() {
       const currentScrollY = window.scrollY
       const previousScrollY = lastScrollY.current
 
+      if (menuOpenRef.current) {
+        setHeaderVisible(true)
+        lastScrollY.current = currentScrollY
+        return
+      }
+
       if (currentScrollY <= 12) {
         setHeaderVisible(true)
       } else if (currentScrollY > previousScrollY + 6) {
         setHeaderVisible(false)
-        setMenuOpen(false)
       } else if (currentScrollY < previousScrollY - 6) {
         setHeaderVisible(true)
       }
@@ -61,8 +73,46 @@ function SiteLayout() {
     }
   }, [])
 
+  useEffect(() => {
+    if (!menuOpen) {
+      return undefined
+    }
+
+    function handleOutsidePointer(event) {
+      const target = event.target
+
+      if (
+        menuRailRef.current?.contains(target) ||
+        menuButtonRef.current?.contains(target)
+      ) {
+        return
+      }
+
+      setMenuOpen(false)
+    }
+
+    function handleEscape(event) {
+      if (event.key === 'Escape') {
+        setMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handleOutsidePointer)
+    document.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.removeEventListener('pointerdown', handleOutsidePointer)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [menuOpen])
+
   function handleLinkClick() {
     setMenuOpen(false)
+  }
+
+  function handleMenuToggle() {
+    setHeaderVisible(true)
+    setMenuOpen((current) => !current)
   }
 
   return (
@@ -101,22 +151,49 @@ function SiteLayout() {
                 {theme === 'dark' ? 'Dark' : 'Light'}
               </span>
             </button>
-            <button
-              type="button"
-              className="icon-button"
-              aria-label="Menu"
-              title="Menu"
-              onClick={() => setMenuOpen((current) => !current)}
-            >
-              <svg viewBox="0 0 24 24" className="icon-svg" aria-hidden="true">
-                <path d="M4 7h16M4 12h16M4 17h16" />
-              </svg>
-            </button>
+            <div className="menu-rail-shell">
+              <nav
+                id="header-command-menu"
+                ref={menuRailRef}
+                className={`menu-rail ${menuOpen ? 'menu-rail-open' : ''}`}
+                aria-label="Main navigation"
+              >
+                {menuItems.map((item) => (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === '/'}
+                    className={({ isActive }) =>
+                      `menu-rail-link ${isActive ? 'menu-rail-link-active' : ''}`
+                    }
+                    onClick={handleLinkClick}
+                  >
+                    <span className="menu-rail-link-code">{item.code}</span>
+                    <span className="menu-rail-link-label">{item.label}</span>
+                  </NavLink>
+                ))}
+              </nav>
+              <button
+                ref={menuButtonRef}
+                type="button"
+                className="icon-button"
+                aria-label="Menu"
+                title="Menu"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                aria-controls="header-command-menu"
+                onClick={handleMenuToggle}
+              >
+                <svg viewBox="0 0 24 24" className="icon-svg" aria-hidden="true">
+                  <path d="M4 7h16M4 12h16M4 17h16" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
         {menuOpen ? (
-          <nav className="nav-drawer" aria-label="Main navigation">
+          <nav className="nav-drawer nav-drawer-mobile" aria-label="Main navigation">
             <p className="nav-drawer-label">Command menu</p>
             <div className="nav-drawer-grid">
               {menuItems.map((item) => (
