@@ -220,6 +220,53 @@ runTest('secondary effects include required channels with confidence and basis',
   )
 })
 
+runTest('impact lens model exposes highest selector and channel-specific views', () => {
+  const blockedChokepointIds = deriveConflictChokepoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+  })
+  const scenario = simulateConflict({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    focusModeId: 'energy',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    blockedChokepointIds,
+  })
+  const effectPoints = buildEffectPoints({
+    aggressorId: 'israel',
+    defenderId: 'iran',
+    conflictModeId: 'blockade',
+    durationId: '2m',
+    intensity: 80,
+    selectedCountryId: 'india',
+    blockedChokepointIds,
+  })
+  const countryEffects = buildCountryEffects({
+    scenario,
+    effectPoints,
+    selectedCountryId: 'india',
+    selectedEffectPointId: effectPoints[0]?.id ?? null,
+  })
+
+  const selectableLensIds = countryEffects.impactLensOptions
+    .map((lens) => lens.id)
+    .filter((lensId) => lensId !== 'highest')
+  const topSelectableScore = Math.max(
+    ...selectableLensIds.map((lensId) => countryEffects.impactLenses[lensId].score),
+  )
+
+  assert.equal(countryEffects.defaultImpactLensId, 'highest')
+  assert.equal(countryEffects.impactLensOptions[0].id, 'highest')
+  assert.equal(countryEffects.impactLenses.highest.score, topSelectableScore)
+  assert.equal(Boolean(countryEffects.impactLenses.petrol), true)
+  assert.equal(Boolean(countryEffects.impactLenses.oil), true)
+})
+
 runTest('india electricity effect remains lower than retail fuel effect under hormuz stress', () => {
   const blockedChokepointIds = deriveConflictChokepoints({
     aggressorId: 'israel',

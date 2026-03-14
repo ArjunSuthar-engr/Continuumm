@@ -1246,6 +1246,41 @@
     color: var(--theme-text-strong);
   }
 
+  .impact-selector-grid {
+    @apply grid gap-3;
+    grid-template-columns: 1fr;
+  }
+
+  .impact-lens-head {
+    @apply flex items-end justify-between gap-3;
+  }
+
+  .impact-lens-title {
+    @apply mt-2 text-2xl leading-tight;
+    color: var(--theme-text-strong);
+  }
+
+  .impact-lens-score {
+    @apply text-3xl leading-none;
+    color: var(--theme-text-strong);
+  }
+
+  .impact-lens-score span {
+    @apply ml-1 text-base;
+    color: var(--theme-text-muted);
+  }
+
+  .impact-driver-list {
+    @apply space-y-2;
+  }
+
+  .impact-driver-line {
+    @apply rounded-[8px] border px-3 py-2 text-sm leading-6;
+    border-color: var(--theme-border);
+    background: var(--theme-contrast-surface);
+    color: var(--theme-text-base);
+  }
+
   .impact-meta-row {
     @apply flex flex-wrap gap-2;
   }
@@ -1380,6 +1415,36 @@
     border-color: var(--theme-border);
     color: var(--theme-text-faint);
     background: var(--theme-soft-surface);
+  }
+
+  .impact-details-card {
+    @apply p-0;
+    overflow: hidden;
+  }
+
+  .impact-details-summary {
+    @apply cursor-pointer list-none px-4 py-3 text-sm font-medium;
+    color: var(--theme-text-strong);
+    background: var(--theme-contrast-surface);
+  }
+
+  .impact-details-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .impact-details-summary::after {
+    content: '+';
+    float: right;
+    color: var(--theme-text-muted);
+  }
+
+  .impact-details-card[open] .impact-details-summary::after {
+    content: '-';
+  }
+
+  .impact-details-content {
+    @apply border-t px-4 py-4;
+    border-color: var(--theme-border);
   }
 
   .effect-outcome-list {
@@ -1654,6 +1719,10 @@
     grid-template-columns: 1fr;
   }
 
+  .impact-selector-grid {
+    grid-template-columns: 1fr;
+  }
+
   .theater-stage {
     min-height: 410px;
   }
@@ -1716,6 +1785,15 @@
     line-height: 1.6;
   }
 
+  .impact-lens-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .impact-lens-score {
+    font-size: 2rem;
+  }
+
   .theater-stage {
     min-height: 340px;
   }
@@ -1726,5 +1804,11 @@
 
   .node-name {
     @apply text-[11px];
+  }
+}
+
+@media (min-width: 721px) {
+  .impact-selector-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

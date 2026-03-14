@@ -172,6 +172,31 @@ function buildEffectItem({
   }
 }
 
+function buildLensDetail({
+  id,
+  label,
+  selectedCountryName,
+  effect,
+  selectedPoint,
+  noShockLine,
+}) {
+  const pointDriverLine = selectedPoint
+    ? `${selectedPoint.name}: modeled route exposure ${selectedPoint.modelledImportShare}% for this country.`
+    : noShockLine
+
+  return {
+    id,
+    label,
+    score: effect.score,
+    band: effect.band,
+    confidence: effect.confidence,
+    dataBasis: effect.dataBasis,
+    dataSource: effect.dataSource,
+    verdict: `${selectedCountryName}: ${label.toLowerCase()} shows ${effect.effect} (${effect.score}/100, ${effect.band.toLowerCase()}).`,
+    why: [effect.summary, pointDriverLine],
+  }
+}
+
 export function buildCountryEffects({
   effectPoints,
   selectedCountryId,
@@ -411,12 +436,106 @@ export function buildCountryEffects({
     ? `${selectedCountryName}: route shock active (${Math.max(primary.energyImportScore, primary.shippingRouteScore)}/100) with fastest pass-through in ${topSecondary.label.toLowerCase()} (${topSecondary.score}/100).`
     : `${selectedCountryName}: no active route-control shock in this war setup.`
 
+  const noShockLine =
+    'No currently disruptable chokepoint in this war setup, so route-pressure transmission stays low.'
+  const effectById = Object.fromEntries(
+    [...primaryEffects, ...secondaryEffects].map((effect) => [effect.id, effect]),
+  )
+  const lensDefinitions = [
+    {
+      id: 'oil',
+      label: 'Oil import shock',
+      effectId: 'primary-energy-import',
+    },
+    {
+      id: 'petrol',
+      label: 'Petrol/Diesel prices',
+      effectId: 'secondary-fuel-retail',
+    },
+    {
+      id: 'freight',
+      label: 'Freight/logistics',
+      effectId: 'secondary-freight',
+    },
+    {
+      id: 'inflation',
+      label: 'Inflation pressure',
+      effectId: 'secondary-inflation',
+    },
+    {
+      id: 'electricity',
+      label: 'Electricity tariff impact',
+      effectId: 'secondary-electricity',
+    },
+    {
+      id: 'industry',
+      label: 'Industry/logistics stress',
+      effectId: 'secondary-manufacturing',
+    },
+  ]
+  const selectableLenses = lensDefinitions
+    .map((lens) => {
+      const effect = effectById[lens.effectId]
+
+      if (!effect) {
+        return null
+      }
+
+      return buildLensDetail({
+        id: lens.id,
+        label: lens.label,
+        selectedCountryName,
+        effect,
+        selectedPoint,
+        noShockLine,
+      })
+    })
+    .filter(Boolean)
+  const highestLens = selectableLenses.reduce((top, current) => {
+    if (!top || current.score > top.score) {
+      return current
+    }
+
+    return top
+  }, null)
+  const impactLensOptions = [
+    { id: 'highest', label: 'Highest impact' },
+    ...selectableLenses.map((lens) => ({ id: lens.id, label: lens.label })),
+  ]
+  const impactLenses = Object.fromEntries(
+    selectableLenses.map((lens) => [lens.id, lens]),
+  )
+
+  if (highestLens) {
+    impactLenses.highest = {
+      ...highestLens,
+      id: 'highest',
+      label: 'Highest impact',
+      verdict: `${selectedCountryName}: highest exposed channel is ${highestLens.label.toLowerCase()} (${highestLens.score}/100, ${highestLens.band.toLowerCase()}).`,
+    }
+  } else {
+    impactLenses.highest = {
+      id: 'highest',
+      label: 'Highest impact',
+      score: 6,
+      band: 'Low',
+      confidence: 'Low',
+      dataBasis: 'modelled',
+      dataSource: 'No currently disruptable chokepoint in this scenario.',
+      verdict: `${selectedCountryName}: no active route-control shock detected in this setup.`,
+      why: [noShockLine],
+    }
+  }
+
   return {
     oneLineSummary,
     immediateSummary,
     horizonCards,
     primaryEffects,
     secondaryEffects,
+    impactLensOptions,
+    impactLenses,
+    defaultImpactLensId: 'highest',
     dataAsOf: countrySecondarySnapshot.asOf,
     dataSources: countrySecondarySnapshot.sources,
   }

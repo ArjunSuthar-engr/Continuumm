@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-035',
+    date: '2026-03-14',
+    label: 'Country panel simplification',
+    title: 'Reworked the right panel into lens-based impact selection',
+    summary:
+      'The country-impact panel is now selector-driven: users pick country plus an impact lens (highest, oil, petrol, freight, inflation, electricity, industry) and see one focused result instead of a long stacked list.',
+    items: [
+      'Added a new impact-lens model to the country-effects engine, including a deterministic "Highest impact" view computed from channel scores.',
+      'Redesigned the right panel around two selectors and one focused impact card with concise verdict, score, confidence, basis, and source.',
+      'Moved longer content into a collapsed "Show details" section with horizon cards and full channel list for optional drilldown.',
+    ],
+    review:
+      'On Simulator, select a country and switch lenses to verify the focused result updates instantly while detailed content stays hidden until expanded.',
+  },
+  {
     id: 'log-034',
     date: '2026-03-14',
     label: 'Live link',

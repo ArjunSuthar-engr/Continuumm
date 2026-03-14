@@ -31,6 +31,7 @@ function SimulatorPage() {
     scenario.topAffected[0]?.id ?? scenario.aggressor.id,
   )
   const [selectedChokepointId, setSelectedChokepointId] = useState(null)
+  const [selectedImpactLensId, setSelectedImpactLensId] = useState('highest')
   const effectiveSelectedCountryId = scenario.countries.some(
     (country) => country.id === selectedCountryId,
   )
@@ -87,12 +88,23 @@ function SimulatorPage() {
   function handleMapCountrySelect(countryId) {
     setSelectedCountryId(countryId)
     setSelectedChokepointId(null)
+    setSelectedImpactLensId('highest')
   }
 
   function handleChokepointSelect(chokepointId) {
     setSelectedChokepointId((current) =>
       current === chokepointId ? null : chokepointId,
     )
+  }
+
+  function handlePanelCountrySelect(countryId) {
+    setSelectedCountryId(countryId)
+    setSelectedChokepointId(null)
+    setSelectedImpactLensId('highest')
+  }
+
+  function handlePanelEffectPointSelect(chokepointId) {
+    setSelectedChokepointId(chokepointId || null)
   }
 
   return (
@@ -149,8 +161,10 @@ function SimulatorPage() {
           countryEffects={countryEffects}
           selectedCountryId={effectiveSelectedCountryId}
           selectedEffectPointId={effectiveSelectedEffectPointId}
-          onEffectPointSelect={handleChokepointSelect}
-          onCountrySelect={setSelectedCountryId}
+          selectedImpactLensId={selectedImpactLensId}
+          onEffectPointSelect={handlePanelEffectPointSelect}
+          onCountrySelect={handlePanelCountrySelect}
+          onImpactLensSelect={setSelectedImpactLensId}
         />
       </section>
     </div>
