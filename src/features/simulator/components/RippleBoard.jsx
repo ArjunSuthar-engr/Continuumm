@@ -203,97 +203,7 @@ function RippleBoard({
       </div>
 
       <div className="board-shell p-4 sm:p-5">
-        <div className="map-kpi-strip">
-          <div className="stat-chip">
-            <span className="stat-chip-label">War pair</span>
-            <strong className="stat-chip-value">
-              {scenario.aggressor.name} vs {scenario.defender.name}
-            </strong>
-          </div>
-          <div className="stat-chip">
-            <span className="stat-chip-label">Controllable chokepoints</span>
-            <strong className="stat-chip-value">{blockedChokepointIds.length}</strong>
-          </div>
-          <div className="stat-chip">
-            <span className="stat-chip-label">Top spillover</span>
-            <strong className="stat-chip-value">{scenario.topAffected[0].name}</strong>
-          </div>
-        </div>
-
-        <div className="map-line-legend">
-          {Object.entries(lineStyles).map(([lineId, lineStyle]) => (
-            <article key={lineId} className="line-legend-item">
-              <svg
-                viewBox="0 0 100 12"
-                className="line-legend-swatch"
-                aria-hidden="true"
-              >
-                <line
-                  x1="2"
-                  y1="6"
-                  x2="98"
-                  y2="6"
-                  stroke={lineStyle.color}
-                  strokeWidth={lineStyle.weight}
-                  strokeDasharray={lineStyle.dashArray}
-                  strokeLinecap="round"
-                  opacity={lineStyle.opacity}
-                />
-              </svg>
-              <div className="line-legend-copy">
-                <strong>{lineStyle.name}</strong>
-                <span>{lineStyle.note}</span>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <div className="map-point-legend">
-          <article className="point-legend-item">
-            <span className="point-legend-dot point-legend-dot-high" />
-            <span>High effect (control + dependence)</span>
-          </article>
-          <article className="point-legend-item">
-            <span className="point-legend-dot point-legend-dot-elevated" />
-            <span>Elevated effect (partial dependence)</span>
-          </article>
-          <article className="point-legend-item">
-            <span className="point-legend-dot point-legend-dot-watch" />
-            <span>Watch-level effect</span>
-          </article>
-        </div>
-
-        <div className="map-impact-legend">
-          <article className="impact-legend-item">
-            <span className="impact-legend-swatch impact-legend-swatch-primary" />
-            <span>Primary signal: route/corridor transmission</span>
-          </article>
-          <article className="impact-legend-item">
-            <span className="impact-legend-swatch impact-legend-swatch-secondary" />
-            <span>Secondary signal: domestic downstream impact</span>
-          </article>
-        </div>
-
-        <div className="map-layer-toggle-grid">
-          {mapRouteLayerTypes.map((layer) => (
-            <button
-              key={layer.id}
-              type="button"
-              className={`map-layer-toggle ${
-                visibleLayers[layer.id] ? 'map-layer-toggle-active' : ''
-              }`}
-              onClick={() => toggleLayer(layer.id)}
-            >
-              <span className="map-layer-toggle-code">{layer.short}</span>
-              <span className="map-layer-toggle-copy">
-                <strong>{layer.label}</strong>
-                <span>{layer.description}</span>
-              </span>
-            </button>
-          ))}
-        </div>
-
-        <div className="world-map-shell mt-4">
+        <div className="world-map-shell">
           <MapContainer
             center={[22, 18]}
             zoom={2}
@@ -553,6 +463,98 @@ function RippleBoard({
                 })
               : null}
           </MapContainer>
+        </div>
+
+        <div className="map-context-stack mt-4">
+          <div className="map-kpi-strip">
+            <div className="stat-chip">
+              <span className="stat-chip-label">War pair</span>
+              <strong className="stat-chip-value">
+                {scenario.aggressor.name} vs {scenario.defender.name}
+              </strong>
+            </div>
+            <div className="stat-chip">
+              <span className="stat-chip-label">Controllable chokepoints</span>
+              <strong className="stat-chip-value">{blockedChokepointIds.length}</strong>
+            </div>
+            <div className="stat-chip">
+              <span className="stat-chip-label">Top spillover</span>
+              <strong className="stat-chip-value">{scenario.topAffected[0].name}</strong>
+            </div>
+          </div>
+
+          <div className="map-line-legend">
+            {Object.entries(lineStyles).map(([lineId, lineStyle]) => (
+              <article key={lineId} className="line-legend-item">
+                <svg
+                  viewBox="0 0 100 12"
+                  className="line-legend-swatch"
+                  aria-hidden="true"
+                >
+                  <line
+                    x1="2"
+                    y1="6"
+                    x2="98"
+                    y2="6"
+                    stroke={lineStyle.color}
+                    strokeWidth={lineStyle.weight}
+                    strokeDasharray={lineStyle.dashArray}
+                    strokeLinecap="round"
+                    opacity={lineStyle.opacity}
+                  />
+                </svg>
+                <div className="line-legend-copy">
+                  <strong>{lineStyle.name}</strong>
+                  <span>{lineStyle.note}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="map-point-legend">
+            <article className="point-legend-item">
+              <span className="point-legend-dot point-legend-dot-high" />
+              <span>High effect (control + dependence)</span>
+            </article>
+            <article className="point-legend-item">
+              <span className="point-legend-dot point-legend-dot-elevated" />
+              <span>Elevated effect (partial dependence)</span>
+            </article>
+            <article className="point-legend-item">
+              <span className="point-legend-dot point-legend-dot-watch" />
+              <span>Watch-level effect</span>
+            </article>
+          </div>
+
+          <div className="map-impact-legend">
+            <article className="impact-legend-item">
+              <span className="impact-legend-swatch impact-legend-swatch-primary" />
+              <span>Primary signal: route/corridor transmission</span>
+            </article>
+            <article className="impact-legend-item">
+              <span className="impact-legend-swatch impact-legend-swatch-secondary" />
+              <span>Secondary signal: domestic downstream impact</span>
+            </article>
+          </div>
+
+          <div className="map-layer-toggle-grid">
+            {mapRouteLayerTypes.map((layer) => (
+              <button
+                key={layer.id}
+                type="button"
+                className={`map-layer-toggle ${
+                  visibleLayers[layer.id] ? 'map-layer-toggle-active' : ''
+                }`}
+                onClick={() => toggleLayer(layer.id)}
+              >
+                <span className="map-layer-toggle-code">{layer.short}</span>
+                <span className="map-layer-toggle-copy">
+                  <strong>{layer.label}</strong>
+                  <span>{layer.description}</span>
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <article className="mini-panel mt-4">

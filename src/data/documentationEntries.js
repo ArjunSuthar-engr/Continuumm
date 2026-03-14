@@ -6,6 +6,21 @@ export const documentationWorkflow = [
 
 export const documentationEntries = [
   {
+    id: 'log-036',
+    date: '2026-03-14',
+    label: 'Map-first layout',
+    title: 'Moved the simulator map to the top of the effects panel',
+    summary:
+      'The middle panel now leads with the interactive map, while KPI chips, legends, and layer toggles were moved below it so users reach the core visual immediately without losing any context.',
+    items: [
+      'Reordered the Effects Map panel structure so the world map renders first.',
+      'Kept all existing informational blocks (war-pair KPI, legends, and layer toggles) intact and moved them directly below the map.',
+      'Added a subtle grouped surface for the moved context section to keep information dense but visually secondary.',
+    ],
+    review:
+      'Open the Simulator page and verify the map is now the first visible element in the middle column while all legends/toggles still function below it.',
+  },
+  {
     id: 'log-035',
     date: '2026-03-14',
     label: 'Country panel simplification',
