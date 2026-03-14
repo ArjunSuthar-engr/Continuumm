@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Circle,
   CircleMarker,
@@ -21,7 +21,10 @@ function RippleBoard({
   focusedReasons,
   activeImpactLensId,
   activeImpactLensLabel,
+  activeImpactLens,
   selectedCountryId,
+  isReasonOverlayOpen,
+  onCloseReasonOverlay,
   onSelectCountry,
   selectedEffectPointId,
   onSelectChokepoint,
@@ -43,6 +46,9 @@ function RippleBoard({
   )
   const activeEffectPoint = selectedEffectPoint ?? effectPoints[0]
   const topFocusedReason = focusedReasons[0] ?? null
+  const activeOverlayReason =
+    focusedReasons.find((reason) => reason.chokepointId === selectedEffectPointId) ??
+    topFocusedReason
   const reasonByChokepointId = useMemo(
     () =>
       Object.fromEntries(
@@ -58,6 +64,37 @@ function RippleBoard({
     Object.fromEntries(mapRouteLayerTypes.map((layer) => [layer.id, true])),
   )
   const [selectedLayerInsight, setSelectedLayerInsight] = useState(null)
+  const overlayRef = useRef(null)
+
+  useEffect(() => {
+    if (!isReasonOverlayOpen || typeof document === 'undefined') {
+      return undefined
+    }
+
+    const handleOutsidePointerDown = (event) => {
+      const target = event.target
+
+      if (!(target instanceof Element)) {
+        return
+      }
+
+      if (overlayRef.current?.contains(target)) {
+        return
+      }
+
+      if (target.closest('.impact-effect-option')) {
+        return
+      }
+
+      onCloseReasonOverlay?.()
+    }
+
+    document.addEventListener('pointerdown', handleOutsidePointerDown, true)
+
+    return () => {
+      document.removeEventListener('pointerdown', handleOutsidePointerDown, true)
+    }
+  }, [isReasonOverlayOpen, onCloseReasonOverlay])
 
   const tileUrl =
     theme === 'light'
@@ -245,6 +282,7 @@ function RippleBoard({
             zoom={2}
             minZoom={2}
             maxZoom={6}
+            zoomControl={false}
             scrollWheelZoom={true}
             worldCopyJump={true}
             className="world-map-canvas"
@@ -526,6 +564,82 @@ function RippleBoard({
                 })
               : null}
           </MapContainer>
+
+          {isReasonOverlayOpen ? (
+            <aside
+              ref={overlayRef}
+              className="map-reason-overlay"
+              aria-live="polite"
+            >
+              <div className="map-reason-overlay-head">
+                <p className="eyebrow">Selected effect</p>
+                <button
+                  type="button"
+                  className="map-reason-overlay-close"
+                  onClick={() => onCloseReasonOverlay?.()}
+                  aria-label="Close effect overlay"
+                >
+                  ×
+                </button>
+              </div>
+
+              <h3 className="map-reason-overlay-title">{activeImpactLensLabel}</h3>
+              <p className="map-reason-overlay-summary">
+                {activeImpactLens?.verdict ??
+                  `${selectedCountryName}: effect reading unavailable for current setup.`}
+              </p>
+
+              <div className="map-reason-overlay-meta">
+                <span className="map-reason-overlay-pill">
+                  Score {activeImpactLens?.score ?? '--'}/100
+                </span>
+                <span className="map-reason-overlay-pill">
+                  {activeImpactLens?.band ?? 'Low'} pressure
+                </span>
+                <span className="map-reason-overlay-pill">
+                  {hasEffectPathway ? `${focusedReasons.length} reasons` : 'No active reason'}
+                </span>
+              </div>
+
+              <p className="eyebrow mt-3">Why this may rise</p>
+              <div className="map-reason-why-lines">
+                {(activeImpactLens?.why ?? [boardIntroCopy]).map((line, index) => (
+                  <p key={`${activeImpactLensId}-why-${index}`}>{line}</p>
+                ))}
+              </div>
+
+              {hasEffectPathway ? (
+                <div className="map-reason-overlay-list">
+                  {focusedReasons.map((reason) => {
+                    const isActive =
+                      reason.chokepointId === activeOverlayReason?.chokepointId
+
+                    return (
+                      <button
+                        key={reason.id}
+                        type="button"
+                        className={`map-reason-overlay-item ${
+                          isActive ? 'map-reason-overlay-item-active' : ''
+                        }`}
+                        onClick={() => onSelectChokepoint(reason.chokepointId)}
+                      >
+                        <div className="map-reason-overlay-item-head">
+                          <strong>{reason.chokepointName}</strong>
+                          <span>{reason.contributionPct}%</span>
+                        </div>
+                        <p>{reason.summary}</p>
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="map-reason-overlay-empty">
+                  No ranked route reason is active for this effect in the current
+                  setup.
+                </p>
+              )}
+            </aside>
+          ) : null}
         </div>
 
         <div className="map-context-stack mt-4">

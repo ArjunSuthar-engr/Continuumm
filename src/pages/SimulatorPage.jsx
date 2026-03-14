@@ -32,6 +32,7 @@ function SimulatorPage() {
   )
   const [selectedChokepointId, setSelectedChokepointId] = useState(null)
   const [selectedImpactLensId, setSelectedImpactLensId] = useState('highest')
+  const [isReasonOverlayOpen, setReasonOverlayOpen] = useState(false)
   const effectiveSelectedCountryId = scenario.countries.some(
     (country) => country.id === selectedCountryId,
   )
@@ -93,12 +94,14 @@ function SimulatorPage() {
   function handleWarCountryChange(kind, value) {
     handleCountryChange(kind, value)
     setSelectedChokepointId(null)
+    setReasonOverlayOpen(false)
   }
 
   function handleMapCountrySelect(countryId) {
     setSelectedCountryId(countryId)
     setSelectedChokepointId(null)
     setSelectedImpactLensId('highest')
+    setReasonOverlayOpen(false)
   }
 
   function handleChokepointSelect(chokepointId) {
@@ -111,10 +114,19 @@ function SimulatorPage() {
     setSelectedCountryId(countryId)
     setSelectedChokepointId(null)
     setSelectedImpactLensId('highest')
+    setReasonOverlayOpen(false)
   }
 
   function handlePanelEffectPointSelect(chokepointId) {
     setSelectedChokepointId(chokepointId || null)
+  }
+
+  function handlePanelImpactLensSelect(lensId) {
+    setSelectedImpactLensId(lensId)
+  }
+
+  function handleOpenReasonOverlayFromEffectOption() {
+    setReasonOverlayOpen(true)
   }
 
   return (
@@ -162,7 +174,10 @@ function SimulatorPage() {
           focusedReasons={focusedReasons}
           activeImpactLensId={effectiveImpactLensId}
           activeImpactLensLabel={selectedImpactLens?.label ?? 'Highest impact'}
+          activeImpactLens={selectedImpactLens}
           selectedCountryId={effectiveSelectedCountryId}
+          isReasonOverlayOpen={isReasonOverlayOpen}
+          onCloseReasonOverlay={() => setReasonOverlayOpen(false)}
           onSelectCountry={handleMapCountrySelect}
           selectedEffectPointId={effectiveSelectedEffectPointId}
           onSelectChokepoint={handleChokepointSelect}
@@ -177,7 +192,8 @@ function SimulatorPage() {
           selectedImpactLensId={selectedImpactLensId}
           onEffectPointSelect={handlePanelEffectPointSelect}
           onCountrySelect={handlePanelCountrySelect}
-          onImpactLensSelect={setSelectedImpactLensId}
+          onImpactLensSelect={handlePanelImpactLensSelect}
+          onOpenReasonOverlay={handleOpenReasonOverlayFromEffectOption}
         />
       </section>
     </div>

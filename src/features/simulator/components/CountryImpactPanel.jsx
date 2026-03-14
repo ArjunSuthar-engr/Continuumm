@@ -22,11 +22,9 @@ function CountryImpactPanel({
   onEffectPointSelect,
   onCountrySelect,
   onImpactLensSelect,
+  onOpenReasonOverlay,
 }) {
   const selectedCountry = scenario.countries.find(
-    (country) => country.id === selectedCountryId,
-  )
-  const selectedImpact = scenario.results.find(
     (country) => country.id === selectedCountryId,
   )
   const selectedEffectPoint = effectPoints.find(
@@ -35,14 +33,6 @@ function CountryImpactPanel({
   const activeEffectPoint = selectedEffectPoint ?? effectPoints[0] ?? null
   const hasEffectPoints = effectPoints.length > 0
   const horizonCards = countryEffects?.horizonCards ?? []
-  const oneLineSummary = countryEffects?.oneLineSummary
-  const immediateOutcome = selectedImpact
-    ? `${selectedCountry?.name} is currently under ${selectedImpact.band.toLowerCase()} structural pressure (${selectedImpact.totalScore}/100).`
-    : `${selectedCountry?.name} is one of the belligerents, so downstream ranking appears on third-country economies.`
-  const outcomeLine = hasEffectPoints
-    ? `${countryEffects?.immediateSummary ?? immediateOutcome}`
-    : `No chokepoint is currently disruptable by ${scenario.aggressor.name} or ${scenario.defender.name}, so direct route shock on ${selectedCountry?.name} is limited in this scenario.`
-  const headlineLine = hasEffectPoints ? oneLineSummary ?? outcomeLine : outcomeLine
 
   const impactLensOptions = countryEffects?.impactLensOptions ?? [
     { id: 'highest', label: 'Highest impact' },
@@ -65,10 +55,6 @@ function CountryImpactPanel({
   })
   const activeReasons = activeLens?.reasons ?? []
   const hasActiveReasons = activeReasons.length > 0
-  const selectedReason =
-    activeReasons.find((reason) => reason.chokepointId === activeEffectPoint?.id) ??
-    activeReasons[0] ??
-    null
   const compactEffects = [
     ...(countryEffects?.primaryEffects ?? []),
     ...(countryEffects?.secondaryEffects ?? []),
@@ -76,6 +62,7 @@ function CountryImpactPanel({
 
   function handleEffectOptionSelect(nextLensId) {
     onImpactLensSelect(nextLensId)
+    onOpenReasonOverlay?.()
     const topReason = impactLenses[nextLensId]?.topReason
 
     if (topReason?.chokepointId) {
@@ -121,8 +108,8 @@ function CountryImpactPanel({
 
           <p className="eyebrow mt-4">Effect options</p>
           <p className="impact-options-copy mt-2">
-            Choose one outcome channel. Then click any reason below to inspect why it
-            may rise.
+            Choose one outcome channel. The selected effect and reasons open over
+            the map.
           </p>
 
           <div className="impact-effect-option-grid mt-3">
@@ -152,88 +139,6 @@ function CountryImpactPanel({
               </button>
             ))}
           </div>
-        </article>
-
-        <article className="impact-card">
-          <div className="impact-lens-head">
-            <div>
-              <p className="eyebrow">Selected effect</p>
-              <h3 className="impact-lens-title">
-                {getEffectOptionLabel(activeLensId, activeLens?.label ?? 'Highest impact')}
-              </h3>
-            </div>
-            <div className="impact-lens-score">
-              {activeLens?.score ?? 6}
-              <span>/100</span>
-            </div>
-          </div>
-
-          <p className="impact-headline">{activeLens?.verdict ?? headlineLine}</p>
-
-          <div className="impact-driver-list mt-3">
-            {(activeLens?.why ?? [outcomeLine]).map((line, index) => (
-              <p key={`${activeLensId}-driver-${index}`} className="impact-driver-line">
-                {line}
-              </p>
-            ))}
-          </div>
-
-          <p className="eyebrow mt-4">Why this may rise</p>
-          {hasEffectPoints && activeReasons.length > 0 ? (
-            <div className="impact-reason-list mt-3">
-              {activeReasons.map((reason) => {
-                const isReasonActive = reason.chokepointId === selectedReason?.chokepointId
-
-                return (
-                  <button
-                    key={reason.id}
-                    type="button"
-                    className={`impact-reason-button ${
-                      isReasonActive ? 'impact-reason-button-active' : ''
-                    }`}
-                    onClick={() => onEffectPointSelect(reason.chokepointId)}
-                  >
-                    <div className="impact-reason-head">
-                      <strong className="impact-reason-title">{reason.chokepointName}</strong>
-                      <span className="impact-reason-share">
-                        {reason.contributionPct}% of pressure
-                      </span>
-                    </div>
-                    <p className="impact-reason-line">{reason.summary}</p>
-                    <p className="impact-reason-line">{reason.evidenceLine}</p>
-                    <p className="impact-reason-meta">
-                      Control {reason.controlEffectiveScorePct}/100 vs threshold{' '}
-                      {reason.controlThresholdPct}/100 | {reason.controlBy} |{' '}
-                      {reason.pressureBand} pressure
-                    </p>
-                  </button>
-                )
-              })}
-            </div>
-          ) : (
-            <p className="impact-driver-line mt-3">
-              No ranked chokepoint reason is active for this effect right now. Try a
-              different war pair or raise severity to cross route-control thresholds.
-            </p>
-          )}
-
-          <div className="impact-meta-row mt-3">
-            <span className="impact-meta-pill">
-              {activeLens?.band ?? 'Low'} pressure
-            </span>
-            <span className="impact-meta-pill">
-              {activeLens?.confidence ?? 'Low'} confidence
-            </span>
-            <span className="impact-meta-pill">
-              Basis: {activeLens?.dataBasis ?? 'modelled'}
-            </span>
-            <span className="impact-meta-pill">
-              Data snapshot: {countryEffects?.dataAsOf ?? 'n/a'}
-            </span>
-          </div>
-          <p className="effect-impact-source mt-3">
-            Source: {activeLens?.dataSource ?? 'Model fallback'}
-          </p>
         </article>
 
         <article className="impact-card">
