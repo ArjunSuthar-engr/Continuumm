@@ -188,7 +188,6 @@ function SimulatorPage() {
           effectPoints={effectPoints}
           countryEffects={countryEffects}
           selectedCountryId={effectiveSelectedCountryId}
-          selectedEffectPointId={effectiveSelectedEffectPointId}
           selectedImpactLensId={selectedImpactLensId}
           onEffectPointSelect={handlePanelEffectPointSelect}
           onCountrySelect={handlePanelCountrySelect}

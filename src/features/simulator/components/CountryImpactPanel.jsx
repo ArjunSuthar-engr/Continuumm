@@ -17,7 +17,6 @@ function CountryImpactPanel({
   effectPoints,
   countryEffects,
   selectedCountryId,
-  selectedEffectPointId,
   selectedImpactLensId,
   onEffectPointSelect,
   onCountrySelect,
@@ -27,10 +26,6 @@ function CountryImpactPanel({
   const selectedCountry = scenario.countries.find(
     (country) => country.id === selectedCountryId,
   )
-  const selectedEffectPoint = effectPoints.find(
-    (point) => point.id === selectedEffectPointId,
-  )
-  const activeEffectPoint = selectedEffectPoint ?? effectPoints[0] ?? null
   const hasEffectPoints = effectPoints.length > 0
   const horizonCards = countryEffects?.horizonCards ?? []
 
@@ -71,7 +66,7 @@ function CountryImpactPanel({
   }
 
   return (
-    <aside className="panel">
+    <aside className="panel country-impact-panel">
       <div className="panel-head">
         <div>
           <p className="eyebrow">Country effect</p>
@@ -85,24 +80,27 @@ function CountryImpactPanel({
       </div>
 
       <div className="space-y-5">
-        <article className="impact-card">
+        <article className="impact-card impact-card-fixed">
           <div className="impact-selector-grid">
             <div>
               <label className="field-label" htmlFor="analysis-country">
                 Country
               </label>
-              <select
-                id="analysis-country"
-                className="field-control"
-                value={selectedCountryId}
-                onChange={(event) => onCountrySelect(event.target.value)}
-              >
-                {scenario.countries.map((country) => (
-                  <option key={country.id} value={country.id}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
+              <div className="field-select-shell">
+                <select
+                  id="analysis-country"
+                  className="field-control"
+                  value={selectedCountryId}
+                  onChange={(event) => onCountrySelect(event.target.value)}
+                >
+                  {scenario.countries.map((country) => (
+                    <option key={country.id} value={country.id}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+                <span className="field-select-spark" aria-hidden="true" />
+              </div>
             </div>
           </div>
 
@@ -112,7 +110,8 @@ function CountryImpactPanel({
             the map.
           </p>
 
-          <div className="impact-effect-option-grid mt-3">
+          <div className="impact-effect-option-scroller mt-3">
+            <div className="impact-effect-option-grid">
             {effectOptions.map((option) => (
               <button
                 key={option.id}
@@ -138,33 +137,13 @@ function CountryImpactPanel({
                 </span>
               </button>
             ))}
+            </div>
           </div>
-        </article>
-
-        <article className="impact-card">
-          <p className="eyebrow">Selected effect point</p>
-          {hasEffectPoints ? (
-            <>
-              <h3 className="mt-3 text-xl text-stone-100">{activeEffectPoint?.name}</h3>
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                {activeEffectPoint?.whyLine}
-              </p>
-              <p className="mt-2 text-xs text-slate-400">
-                Control: {activeEffectPoint?.controlNarrative}
-              </p>
-            </>
-          ) : (
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              No chokepoint is currently controllable by this war pair at the chosen
-              posture. Change pair, mode, or intensity to surface direct route
-              pressure.
-            </p>
-          )}
         </article>
 
         <details className="impact-card impact-details-card">
           <summary className="impact-details-summary">Show details</summary>
-          <div className="impact-details-content">
+          <div className="impact-details-content impact-details-content-scroll">
             <p className="eyebrow">Horizon read</p>
             <div className="horizon-grid mt-3">
               {horizonCards.map((card) => (

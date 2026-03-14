@@ -569,6 +569,10 @@
     @apply space-y-5 px-2 pb-2 pt-6 text-center sm:px-6;
   }
 
+  .home-page-shell {
+    @apply px-1 sm:px-2;
+  }
+
   .landing-kicker {
     @apply mono text-[11px] uppercase tracking-[0.28em];
     color: var(--theme-text-faint);
@@ -1329,6 +1333,88 @@
     color: var(--theme-text-strong);
   }
 
+  .field-select-shell {
+    @apply relative mt-3;
+  }
+
+  .field-select-shell .field-control {
+    @apply mt-0;
+  }
+
+  select.field-control {
+    padding-right: 3.7rem;
+    cursor: pointer;
+  }
+
+  .field-select-shell::after {
+    content: '';
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    width: 1.72rem;
+    height: 1.72rem;
+    border-radius: 999px;
+    border: 1px solid var(--theme-border);
+    background: linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.12),
+      rgba(255, 255, 255, 0.02)
+    );
+    transform: translateY(-50%);
+    pointer-events: none;
+    transition:
+      border-color 170ms ease,
+      background 170ms ease;
+  }
+
+  html[data-theme='light'] .field-select-shell::after {
+    background: linear-gradient(
+      155deg,
+      rgba(17, 24, 39, 0.05),
+      rgba(17, 24, 39, 0.01)
+    );
+  }
+
+  .field-select-shell::before {
+    content: '';
+    position: absolute;
+    right: 1.45rem;
+    top: 50%;
+    width: 0.44rem;
+    height: 0.44rem;
+    border-right: 1.5px solid var(--theme-text-faint);
+    border-bottom: 1.5px solid var(--theme-text-faint);
+    transform: translateY(calc(-50% - 0.12rem)) rotate(45deg);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .field-select-spark {
+    position: absolute;
+    right: 1.66rem;
+    top: 50%;
+    width: 0.08rem;
+    height: 0.34rem;
+    border-radius: 999px;
+    background: var(--theme-accent-strong);
+    transform: translateY(calc(-50% + 0.44rem));
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .field-select-shell:focus-within::after {
+    border-color: var(--theme-accent-border);
+    background: linear-gradient(
+      155deg,
+      rgba(209, 244, 95, 0.16),
+      rgba(111, 98, 255, 0.12)
+    );
+  }
+
+  .field-select-shell:focus-within::before {
+    border-color: var(--theme-text-strong);
+  }
+
   .field-control:focus {
     border-color: var(--theme-accent-border);
     box-shadow: 0 0 0 2px rgba(209, 244, 95, 0.18);
@@ -1619,6 +1705,10 @@
   .world-map-canvas {
     height: 560px;
     width: 100%;
+  }
+
+  .world-map-canvas .leaflet-interactive {
+    cursor: pointer;
   }
 
   .map-reason-overlay {
@@ -1968,6 +2058,12 @@
     @apply space-y-2;
   }
 
+  .control-explainer-list-scroll {
+    max-height: 17.5rem;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+  }
+
   .control-explainer-row {
     @apply flex items-start justify-between gap-3 rounded-[8px] border px-3 py-2;
     border-color: var(--theme-border);
@@ -2010,6 +2106,12 @@
     background: var(--theme-soft-surface);
   }
 
+  .impact-card-fixed {
+    height: clamp(23rem, 56vh, 30rem);
+    display: flex;
+    flex-direction: column;
+  }
+
   .impact-headline {
     @apply mt-2 text-base leading-7;
     color: var(--theme-text-strong);
@@ -2028,6 +2130,13 @@
   .impact-effect-option-grid {
     @apply grid gap-2;
     grid-template-columns: 1fr;
+  }
+
+  .impact-effect-option-scroller {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 0.25rem;
   }
 
   .impact-effect-option {
@@ -2348,6 +2457,12 @@
   .impact-details-content {
     @apply border-t px-4 py-4;
     border-color: var(--theme-border);
+  }
+
+  .impact-details-content-scroll {
+    max-height: clamp(18rem, 44vh, 26rem);
+    overflow-y: auto;
+    padding-right: 0.4rem;
   }
 
   .effect-outcome-list {

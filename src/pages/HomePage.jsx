@@ -7,7 +7,7 @@ function HomePage() {
   const topCountry = snapshot.topAffected[0]
 
   return (
-    <div className="space-y-10">
+    <div className="home-page-shell space-y-10">
       <section className="landing-hero">
         <p className="landing-kicker">Continuumm Platform</p>
         <h1 className="landing-headline">

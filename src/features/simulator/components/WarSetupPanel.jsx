@@ -4,15 +4,12 @@ function WarSetupPanel({
   aggressorId,
   defenderId,
   conflictModeId,
-  durationId,
   intensity,
   blockedChokepointIds,
   controlMap,
   conflictModes,
-  conflictDurations,
   onCountryChange,
   onConflictModeChange,
-  onDurationChange,
   onIntensityChange,
 }) {
   const controlRows = Object.values(controlMap ?? {})
@@ -41,72 +38,63 @@ function WarSetupPanel({
           <label className="field-label" htmlFor="war-country-a">
             Country A
           </label>
-          <select
-            id="war-country-a"
-            className="field-control"
-            value={aggressorId}
-            onChange={(event) => onCountryChange('aggressor', event.target.value)}
-          >
-            {countries.map((country) => (
-              <option key={country.id} value={country.id}>
-                {country.name}
-              </option>
-            ))}
-          </select>
+          <div className="field-select-shell">
+            <select
+              id="war-country-a"
+              className="field-control"
+              value={aggressorId}
+              onChange={(event) => onCountryChange('aggressor', event.target.value)}
+            >
+              {countries.map((country) => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+            <span className="field-select-spark" aria-hidden="true" />
+          </div>
         </div>
 
         <div>
           <label className="field-label" htmlFor="war-country-b">
             Country B
           </label>
-          <select
-            id="war-country-b"
-            className="field-control"
-            value={defenderId}
-            onChange={(event) => onCountryChange('defender', event.target.value)}
-          >
-            {countries.map((country) => (
-              <option key={country.id} value={country.id}>
-                {country.name}
-              </option>
-            ))}
-          </select>
+          <div className="field-select-shell">
+            <select
+              id="war-country-b"
+              className="field-control"
+              value={defenderId}
+              onChange={(event) => onCountryChange('defender', event.target.value)}
+            >
+              {countries.map((country) => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+            <span className="field-select-spark" aria-hidden="true" />
+          </div>
         </div>
 
         <div>
           <label className="field-label" htmlFor="conflict-mode">
             Conflict mode
           </label>
-          <select
-            id="conflict-mode"
-            className="field-control"
-            value={conflictModeId}
-            onChange={(event) => onConflictModeChange(event.target.value)}
-          >
-            {conflictModes.map((mode) => (
-              <option key={mode.id} value={mode.id}>
-                {mode.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="field-label" htmlFor="conflict-duration">
-            Duration
-          </label>
-          <select
-            id="conflict-duration"
-            className="field-control"
-            value={durationId}
-            onChange={(event) => onDurationChange(event.target.value)}
-          >
-            {conflictDurations.map((duration) => (
-              <option key={duration.id} value={duration.id}>
-                {duration.label}
-              </option>
-            ))}
-          </select>
+          <div className="field-select-shell">
+            <select
+              id="conflict-mode"
+              className="field-control"
+              value={conflictModeId}
+              onChange={(event) => onConflictModeChange(event.target.value)}
+            >
+              {conflictModes.map((mode) => (
+                <option key={mode.id} value={mode.id}>
+                  {mode.label}
+                </option>
+              ))}
+            </select>
+            <span className="field-select-spark" aria-hidden="true" />
+          </div>
         </div>
 
         <div>
@@ -144,7 +132,7 @@ function WarSetupPanel({
           <p className="mt-2 text-sm leading-6 text-slate-300">
             Route impact is shown only when effective leverage crosses threshold.
           </p>
-          <div className="control-explainer-list mt-3">
+          <div className="control-explainer-list control-explainer-list-scroll mt-3">
             {controlRows.map((row) => {
               const effectiveScore = Math.round(row.effectiveScore * 100)
               const threshold = Math.round(row.threshold * 100)

@@ -27,6 +27,55 @@ function titleFromId(value) {
     .join(' ')
 }
 
+function weightedSpilloverPressure(country) {
+  return (
+    (country.breakdown?.energy ?? 0) * 0.36 +
+    (country.breakdown?.shipping ?? 0) * 0.28 +
+    (country.breakdown?.trade ?? 0) * 0.2 +
+    (country.breakdown?.strategic ?? 0) * 0.16
+  )
+}
+
+function buildSpilloverRanking(rows) {
+  if (!rows.length) {
+    return []
+  }
+
+  const ranked = rows
+    .map((country) => ({
+      ...country,
+      weightedPressure: weightedSpilloverPressure(country),
+    }))
+    .sort(
+      (a, b) =>
+        b.weightedPressure - a.weightedPressure || b.totalScore - a.totalScore,
+    )
+
+  const pressureValues = ranked.map((country) => country.weightedPressure)
+  const minPressure = Math.min(...pressureValues)
+  const maxPressure = Math.max(...pressureValues)
+
+  return ranked.map((country, index) => {
+    const normalizedPressure =
+      maxPressure === minPressure
+        ? ranked.length === 1
+          ? 1
+          : 1 - index / (ranked.length - 1)
+        : (country.weightedPressure - minPressure) / (maxPressure - minPressure)
+    const spreadScore = Math.round(56 + normalizedPressure * 40)
+    const displayScore = clamp(
+      Math.round(country.totalScore * 0.35 + spreadScore * 0.65),
+      12,
+      96,
+    )
+
+    return {
+      ...country,
+      displayScore,
+    }
+  })
+}
+
 function InfoHint({ text }) {
   return (
     <button type="button" className="info-hint" aria-label={text} title={text}>
@@ -37,7 +86,7 @@ function InfoHint({ text }) {
 
 function buildSpilloverVisual() {
   const snapshot = simulateConflict(defaultScenarioConfig)
-  const topCountries = snapshot.topAffected.slice(0, 6)
+  const topCountries = buildSpilloverRanking(snapshot.results).slice(0, 6)
   const maxBar = 100
   const topCountry = topCountries[0]
 
@@ -142,7 +191,7 @@ function buildSpilloverVisual() {
       bars: topCountries.map((country) => ({
         id: country.id,
         label: country.name,
-        value: country.totalScore,
+        value: country.displayScore,
         max: maxBar,
       })),
     },

@@ -29,36 +29,42 @@ function ConflictPanel({
           <label className="field-label" htmlFor="aggressor">
             First belligerent
           </label>
-          <select
-            id="aggressor"
-            className="field-control"
-            value={aggressorId}
-            onChange={(event) => onCountryChange('aggressor', event.target.value)}
-          >
-            {countries.map((country) => (
-              <option key={country.id} value={country.id}>
-                {country.name}
-              </option>
-            ))}
-          </select>
+          <div className="field-select-shell">
+            <select
+              id="aggressor"
+              className="field-control"
+              value={aggressorId}
+              onChange={(event) => onCountryChange('aggressor', event.target.value)}
+            >
+              {countries.map((country) => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+            <span className="field-select-spark" aria-hidden="true" />
+          </div>
         </div>
 
         <div>
           <label className="field-label" htmlFor="defender">
             Second belligerent
           </label>
-          <select
-            id="defender"
-            className="field-control"
-            value={defenderId}
-            onChange={(event) => onCountryChange('defender', event.target.value)}
-          >
-            {countries.map((country) => (
-              <option key={country.id} value={country.id}>
-                {country.name}
-              </option>
-            ))}
-          </select>
+          <div className="field-select-shell">
+            <select
+              id="defender"
+              className="field-control"
+              value={defenderId}
+              onChange={(event) => onCountryChange('defender', event.target.value)}
+            >
+              {countries.map((country) => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+            <span className="field-select-spark" aria-hidden="true" />
+          </div>
         </div>
 
         <div>

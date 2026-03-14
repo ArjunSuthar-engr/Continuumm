@@ -9,10 +9,7 @@ import {
 } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useTheme } from '../../../components/layout/themeContext'
-import {
-  mapRouteLayers,
-  mapRouteLayerTypes,
-} from '../data/mapRouteLayers.js'
+import { mapRouteLayers } from '../data/mapRouteLayers.js'
 
 function RippleBoard({
   scenario,
@@ -59,9 +56,6 @@ function RippleBoard({
   const focusedReasonSet = useMemo(
     () => new Set(focusedReasons.map((reason) => reason.chokepointId)),
     [focusedReasons],
-  )
-  const [visibleLayers, setVisibleLayers] = useState(() =>
-    Object.fromEntries(mapRouteLayerTypes.map((layer) => [layer.id, true])),
   )
   const [selectedLayerInsight, setSelectedLayerInsight] = useState(null)
   const overlayRef = useRef(null)
@@ -196,13 +190,6 @@ function RippleBoard({
     )
   }, [activeEffectPoint?.id, blockedChokepointIds, focusedReasonSet])
 
-  function toggleLayer(layerId) {
-    setVisibleLayers((current) => ({
-      ...current,
-      [layerId]: !current[layerId],
-    }))
-  }
-
   function buildLayerInsight(item, state) {
     const stateLine =
       state === 'active'
@@ -305,71 +292,67 @@ function RippleBoard({
               />
             ))}
 
-            {visibleLayers.lng
-              ? mapRouteLayers.lng.map((corridor) => {
-                  const state = layerStateById[corridor.id] ?? 'ineligible'
-                  const style = routeLayerStyles[state]
-                  const layerItem = { ...corridor, layerType: 'lng' }
+            {mapRouteLayers.lng.map((corridor) => {
+              const state = layerStateById[corridor.id] ?? 'ineligible'
+              const style = routeLayerStyles[state]
+              const layerItem = { ...corridor, layerType: 'lng' }
 
-                  return (
-                    <Polyline
-                      key={corridor.id}
-                      positions={corridor.positions}
-                      pathOptions={{
-                        color: style.color,
-                        opacity: style.opacity,
-                        weight: style.weight,
-                        dashArray: state === 'ineligible' ? '4 8' : '8 6',
-                      }}
-                      eventHandlers={{
-                        click: () => handleLayerClick(layerItem),
-                      }}
-                    >
-                      <Tooltip
-                        permanent={state === 'active'}
-                        direction="top"
-                        offset={[0, -2]}
-                        className="world-map-tooltip"
-                      >
-                        LNG | {corridor.name}
-                      </Tooltip>
-                    </Polyline>
-                  )
-                })
-              : null}
+              return (
+                <Polyline
+                  key={corridor.id}
+                  positions={corridor.positions}
+                  pathOptions={{
+                    color: style.color,
+                    opacity: style.opacity,
+                    weight: style.weight,
+                    dashArray: state === 'ineligible' ? '4 8' : '8 6',
+                  }}
+                  eventHandlers={{
+                    click: () => handleLayerClick(layerItem),
+                  }}
+                >
+                  <Tooltip
+                    permanent={state === 'active'}
+                    direction="top"
+                    offset={[0, -2]}
+                    className="world-map-tooltip"
+                  >
+                    LNG | {corridor.name}
+                  </Tooltip>
+                </Polyline>
+              )
+            })}
 
-            {visibleLayers.pipeline
-              ? mapRouteLayers.pipeline.map((corridor) => {
-                  const state = layerStateById[corridor.id] ?? 'ineligible'
-                  const style = routeLayerStyles[state]
-                  const layerItem = { ...corridor, layerType: 'pipeline' }
+            {mapRouteLayers.pipeline.map((corridor) => {
+              const state = layerStateById[corridor.id] ?? 'ineligible'
+              const style = routeLayerStyles[state]
+              const layerItem = { ...corridor, layerType: 'pipeline' }
 
-                  return (
-                    <Polyline
-                      key={corridor.id}
-                      positions={corridor.positions}
-                      pathOptions={{
-                        color: style.color,
-                        opacity: style.opacity,
-                        weight: style.weight,
-                        dashArray: state === 'ineligible' ? '2 8' : '',
-                      }}
-                      eventHandlers={{
-                        click: () => handleLayerClick(layerItem),
-                      }}
-                    >
-                      <Tooltip
-                        permanent={state === 'active'}
-                        direction="top"
-                        offset={[0, -2]}
-                        className="world-map-tooltip"
-                      >
-                        Pipeline | {corridor.name}
-                      </Tooltip>
-                    </Polyline>
-                  )
-                })
-              : null}
+              return (
+                <Polyline
+                  key={corridor.id}
+                  positions={corridor.positions}
+                  pathOptions={{
+                    color: style.color,
+                    opacity: style.opacity,
+                    weight: style.weight,
+                    dashArray: state === 'ineligible' ? '2 8' : '',
+                  }}
+                  eventHandlers={{
+                    click: () => handleLayerClick(layerItem),
+                  }}
+                >
+                  <Tooltip
+                    permanent={state === 'active'}
+                    direction="top"
+                    offset={[0, -2]}
+                    className="world-map-tooltip"
+                  >
+                    Pipeline | {corridor.name}
+                  </Tooltip>
+                </Polyline>
+              )
+            })}
 
             {scenario.countries.map((country) => {
               if (!country.coordinates) {
@@ -487,82 +470,79 @@ function RippleBoard({
               )
             })}
 
-            {visibleLayers.ports
-              ? mapRouteLayers.ports.map((port) => {
-                  const state = layerStateById[port.id] ?? 'ineligible'
-                  const style = routeLayerStyles[state]
-                  const layerItem = { ...port, layerType: 'ports' }
+            {mapRouteLayers.ports.map((port) => {
+              const state = layerStateById[port.id] ?? 'ineligible'
+              const style = routeLayerStyles[state]
+              const layerItem = { ...port, layerType: 'ports' }
 
-                  return (
-                    <CircleMarker
-                      key={port.id}
-                      center={port.coordinates}
-                      radius={
-                        state === 'active'
-                          ? 7.2
-                          : state === 'linked'
-                            ? 6.8
-                            : state === 'inactive'
-                              ? 6.2
-                              : 5.2
-                      }
-                      pathOptions={{
-                        color: style.color,
-                        fillColor: style.color,
-                        fillOpacity: state === 'active' ? 0.9 : state === 'linked' ? 0.78 : style.opacity,
-                        weight: state === 'active' ? 2.2 : state === 'linked' ? 1.9 : 1.4,
-                      }}
-                      eventHandlers={{
-                        click: () => handleLayerClick(layerItem),
-                      }}
-                    >
-                      <Tooltip
-                        permanent={state === 'active' || state === 'linked'}
-                        direction="left"
-                        offset={[-4, 0]}
-                        className="world-map-tooltip"
-                      >
-                        Port | {port.name}
-                      </Tooltip>
-                    </CircleMarker>
-                  )
-                })
-              : null}
+              return (
+                <CircleMarker
+                  key={port.id}
+                  center={port.coordinates}
+                  radius={
+                    state === 'active'
+                      ? 7.2
+                      : state === 'linked'
+                        ? 6.8
+                        : state === 'inactive'
+                          ? 6.2
+                          : 5.2
+                  }
+                  pathOptions={{
+                    color: style.color,
+                    fillColor: style.color,
+                    fillOpacity:
+                      state === 'active' ? 0.9 : state === 'linked' ? 0.78 : style.opacity,
+                    weight: state === 'active' ? 2.2 : state === 'linked' ? 1.9 : 1.4,
+                  }}
+                  eventHandlers={{
+                    click: () => handleLayerClick(layerItem),
+                  }}
+                >
+                  <Tooltip
+                    permanent={state === 'active' || state === 'linked'}
+                    direction="left"
+                    offset={[-4, 0]}
+                    className="world-map-tooltip"
+                  >
+                    Port | {port.name}
+                  </Tooltip>
+                </CircleMarker>
+              )
+            })}
 
-            {visibleLayers.insurance
-              ? mapRouteLayers.insurance.map((zone) => {
-                  const state = layerStateById[zone.id] ?? 'ineligible'
-                  const style = routeLayerStyles[state]
-                  const layerItem = { ...zone, layerType: 'insurance' }
+            {mapRouteLayers.insurance.map((zone) => {
+              const state = layerStateById[zone.id] ?? 'ineligible'
+              const style = routeLayerStyles[state]
+              const layerItem = { ...zone, layerType: 'insurance' }
 
-                  return (
-                    <Circle
-                      key={zone.id}
-                      center={zone.center}
-                      radius={zone.radiusKm * 1000}
-                      pathOptions={{
-                        color: style.color,
-                        opacity: style.opacity,
-                        weight: state === 'active' ? 2.2 : state === 'linked' ? 1.9 : 1.4,
-                        fillColor: style.color,
-                        fillOpacity: style.fillOpacity,
-                        dashArray: state === 'ineligible' ? '4 10' : '6 8',
-                      }}
-                      eventHandlers={{
-                        click: () => handleLayerClick(layerItem),
-                      }}
-                    >
-                      <Tooltip
-                        permanent={state === 'active' || state === 'linked'}
-                        direction="center"
-                        className="world-map-tooltip"
-                      >
-                        Insurance | {zone.name}
-                      </Tooltip>
-                    </Circle>
-                  )
-                })
-              : null}
+              return (
+                <Circle
+                  key={zone.id}
+                  center={zone.center}
+                  radius={zone.radiusKm * 1000}
+                  pathOptions={{
+                    color: style.color,
+                    opacity: style.opacity,
+                    weight: state === 'active' ? 2.2 : state === 'linked' ? 1.9 : 1.4,
+                    fillColor: style.color,
+                    fillOpacity: style.fillOpacity,
+                    dashArray: state === 'ineligible' ? '4 10' : '6 8',
+                  }}
+                  eventHandlers={{
+                    click: () => handleLayerClick(layerItem),
+                  }}
+                >
+                  <Tooltip
+                    permanent={state === 'active' || state === 'linked'}
+                    direction="center"
+                    className="world-map-tooltip"
+                  >
+                    Insurance | {zone.name}
+                  </Tooltip>
+                </Circle>
+              )
+            })}
           </MapContainer>
 
           {isReasonOverlayOpen ? (
@@ -641,6 +621,34 @@ function RippleBoard({
             </aside>
           ) : null}
         </div>
+
+        <article className="mini-panel mt-4">
+          <p className="eyebrow">
+            {displayedLayerInsight ? 'Route layer insight' : 'Layer click guide'}
+          </p>
+          {displayedLayerInsight ? (
+            <>
+              <h3 className="mt-2 text-xl text-stone-100">
+                {displayedLayerInsight.name}
+              </h3>
+              <p className="mono mt-1 text-xs uppercase tracking-[0.18em] text-slate-400">
+                {displayedLayerInsight.type} | {displayedLayerInsight.state}
+              </p>
+              <div className="mt-3 space-y-2">
+                {displayedLayerInsight.lines.map((line) => (
+                  <p key={line} className="text-sm leading-6 text-slate-300">
+                    {line}
+                  </p>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="mt-2 text-sm leading-6 text-slate-300">
+              Click any LNG corridor, pipeline line, major port, or insurance zone
+              on the map to see how it changes outcomes for {selectedCountryName}.
+            </p>
+          )}
+        </article>
 
         <div className="map-context-stack mt-4">
           <div className="map-kpi-strip">
@@ -732,122 +740,7 @@ function RippleBoard({
               <span>Selected-effect linkage pathway</span>
             </article>
           </div>
-
-          <div className="map-layer-toggle-grid">
-            {mapRouteLayerTypes.map((layer) => (
-              <button
-                key={layer.id}
-                type="button"
-                className={`map-layer-toggle ${
-                  visibleLayers[layer.id] ? 'map-layer-toggle-active' : ''
-                }`}
-                onClick={() => toggleLayer(layer.id)}
-              >
-                <span className="map-layer-toggle-code">{layer.short}</span>
-                <span className="map-layer-toggle-copy">
-                  <strong>{layer.label}</strong>
-                  <span>{layer.description}</span>
-                </span>
-              </button>
-            ))}
-          </div>
         </div>
-
-        <article className="mini-panel mt-4">
-          <p className="eyebrow">
-            {activeEffectPoint ? 'Selected effect point' : 'How to use'}
-          </p>
-          {activeEffectPoint ? (
-            <>
-              <h3 className="mt-2 text-2xl text-stone-100">
-                {activeEffectPoint.name}
-              </h3>
-              <p className="mt-2 text-xs leading-5 text-slate-400">
-                Active effect: <strong>{activeImpactLensLabel}</strong> | linked
-                chokepoints: <strong>{focusedReasons.length}</strong>
-              </p>
-              {topFocusedReason ? (
-                <p className="mt-1 text-xs leading-5 text-slate-500">
-                  Top reason for this effect: {topFocusedReason.chokepointName} (
-                  {topFocusedReason.contributionPct}% contribution)
-                </p>
-              ) : null}
-              {!hasEffectPathway ? (
-                <p className="mt-1 text-xs leading-5 text-slate-500">
-                  No direct route reason is currently ranked for this effect.
-                </p>
-              ) : null}
-              <p className="mt-2 text-sm leading-6 text-slate-300">
-                {selectedCountryName} route dependence here:{' '}
-                <strong>{activeEffectPoint.modelledImportShare}%</strong> | pressure{' '}
-                <strong>{activeEffectPoint.band}</strong> ({activeEffectPoint.score}
-                /100)
-              </p>
-              <p className="mt-2 text-xs leading-5 text-slate-400">
-                Control: {activeEffectPoint.controlNarrative}
-              </p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">
-                Throughput: {activeEffectPoint.transitMbd} mb/d | data basis:{' '}
-                {activeEffectPoint.dataBasis} ({activeEffectPoint.dataAsOf})
-              </p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">
-                Raw route share {activeEffectPoint.routeShareRawPct}% | pipeline
-                bypass {activeEffectPoint.pipelineBypassPct}% | LNG exposure{' '}
-                {activeEffectPoint.lngImportExposurePct}% | port concentration{' '}
-                {activeEffectPoint.portConcentrationScore}
-              </p>
-              <div className="mt-3 space-y-2">
-                {activeEffectPoint.outcomes.map((outcome) => (
-                  <div
-                    key={outcome.id}
-                    className="flex items-center justify-between rounded-[8px] border px-3 py-2"
-                  >
-                    <span className="text-sm text-stone-100">{outcome.label}</span>
-                    <span className="mono text-xs text-slate-400">
-                      {outcome.effect} | {outcome.score}/100
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-3 text-sm leading-6 text-slate-300">
-                {activeEffectPoint.whyLine}
-              </p>
-            </>
-          ) : (
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              This war pair currently has no chokepoint where either belligerent
-              crosses the disruption-control threshold.
-            </p>
-          )}
-        </article>
-
-        <article className="mini-panel mt-4">
-          <p className="eyebrow">
-            {displayedLayerInsight ? 'Route layer insight' : 'Layer click guide'}
-          </p>
-          {displayedLayerInsight ? (
-            <>
-              <h3 className="mt-2 text-xl text-stone-100">
-                {displayedLayerInsight.name}
-              </h3>
-              <p className="mono mt-1 text-xs uppercase tracking-[0.18em] text-slate-400">
-                {displayedLayerInsight.type} | {displayedLayerInsight.state}
-              </p>
-              <div className="mt-3 space-y-2">
-                {displayedLayerInsight.lines.map((line) => (
-                  <p key={line} className="text-sm leading-6 text-slate-300">
-                    {line}
-                  </p>
-                ))}
-              </div>
-            </>
-          ) : (
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              Click any LNG corridor, pipeline line, major port, or insurance zone
-              on the map to see how it changes outcomes for {selectedCountryName}.
-            </p>
-          )}
-        </article>
       </div>
     </section>
   )
