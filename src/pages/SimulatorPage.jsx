@@ -79,6 +79,16 @@ function SimulatorPage() {
       effectiveSelectedEffectPointId,
     ],
   )
+  const impactLenses = countryEffects?.impactLenses ?? {}
+  const fallbackImpactLensId =
+    countryEffects?.impactLensOptions?.[0]?.id ??
+    countryEffects?.defaultImpactLensId ??
+    'highest'
+  const effectiveImpactLensId = impactLenses[selectedImpactLensId]
+    ? selectedImpactLensId
+    : fallbackImpactLensId
+  const selectedImpactLens = impactLenses[effectiveImpactLensId] ?? null
+  const focusedReasons = selectedImpactLens?.reasons ?? []
 
   function handleWarCountryChange(kind, value) {
     handleCountryChange(kind, value)
@@ -149,6 +159,9 @@ function SimulatorPage() {
           scenario={scenario}
           blockedChokepointIds={blockedChokepointIds}
           effectPoints={effectPoints}
+          focusedReasons={focusedReasons}
+          activeImpactLensId={effectiveImpactLensId}
+          activeImpactLensLabel={selectedImpactLens?.label ?? 'Highest impact'}
           selectedCountryId={effectiveSelectedCountryId}
           onSelectCountry={handleMapCountrySelect}
           selectedEffectPointId={effectiveSelectedEffectPointId}

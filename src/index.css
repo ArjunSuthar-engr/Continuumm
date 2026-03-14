@@ -1434,7 +1434,7 @@
   }
 
   .map-kpi-strip {
-    @apply grid gap-2 border-b border-white/10 pb-4 sm:grid-cols-3;
+    @apply grid gap-2 border-b border-white/10 pb-4 sm:grid-cols-2 lg:grid-cols-4;
   }
 
   .map-context-stack {
@@ -1503,6 +1503,16 @@
     );
   }
 
+  .impact-legend-swatch-reason {
+    border: 1.5px solid #ffbf7a;
+    background: rgba(255, 191, 122, 0.16);
+  }
+
+  html[data-theme='light'] .impact-legend-swatch-reason {
+    border-color: #ba6d38;
+    background: rgba(186, 109, 56, 0.16);
+  }
+
   .map-layer-toggle-grid {
     @apply mt-3 grid gap-2 md:grid-cols-2;
   }
@@ -1569,6 +1579,15 @@
 
   .point-legend-dot-watch {
     background: #8ca4b6;
+  }
+
+  .point-legend-dot-reason {
+    border: 2px solid #ffbf7a;
+    background: transparent;
+  }
+
+  html[data-theme='light'] .point-legend-dot-reason {
+    border-color: #ba6d38;
   }
 
   .world-map-shell {

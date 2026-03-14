@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import {
   Circle,
   CircleMarker,
@@ -18,6 +18,9 @@ function RippleBoard({
   scenario,
   blockedChokepointIds,
   effectPoints,
+  focusedReasons,
+  activeImpactLensId,
+  activeImpactLensLabel,
   selectedCountryId,
   onSelectCountry,
   selectedEffectPointId,
@@ -34,6 +37,18 @@ function RippleBoard({
     (point) => point.id === selectedEffectPointId,
   )
   const activeEffectPoint = selectedEffectPoint ?? effectPoints[0]
+  const topFocusedReason = focusedReasons[0] ?? null
+  const reasonByChokepointId = useMemo(
+    () =>
+      Object.fromEntries(
+        focusedReasons.map((reason) => [reason.chokepointId, reason]),
+      ),
+    [focusedReasons],
+  )
+  const focusedReasonSet = useMemo(
+    () => new Set(focusedReasons.map((reason) => reason.chokepointId)),
+    [focusedReasons],
+  )
   const [visibleLayers, setVisibleLayers] = useState(() =>
     Object.fromEntries(mapRouteLayerTypes.map((layer) => [layer.id, true])),
   )
@@ -81,6 +96,12 @@ function RippleBoard({
       weight: 2.8,
       fillOpacity: 0.2,
     },
+    linked: {
+      color: theme === 'light' ? '#51799c' : '#8fb8d6',
+      opacity: 0.72,
+      weight: 2.5,
+      fillOpacity: 0.16,
+    },
     inactive: {
       color: theme === 'light' ? '#6289aa' : '#8ab3d2',
       opacity: 0.54,
@@ -115,14 +136,23 @@ function RippleBoard({
     return Object.fromEntries(
       items.map((item) => {
         const related = item.relatedChokepoints ?? []
-        const isActive =
-          selectedPointId && related.includes(selectedPointId)
+        const isActive = selectedPointId && related.includes(selectedPointId)
+        const isReasonLinked = related.some((id) => focusedReasonSet.has(id))
         const isEligible = related.some((id) => blockedSet.has(id))
 
-        return [item.id, isActive ? 'active' : isEligible ? 'inactive' : 'ineligible']
+        return [
+          item.id,
+          isActive
+            ? 'active'
+            : isReasonLinked
+              ? 'linked'
+              : isEligible
+                ? 'inactive'
+                : 'ineligible',
+        ]
       }),
     )
-  }, [activeEffectPoint?.id, blockedChokepointIds])
+  }, [activeEffectPoint?.id, blockedChokepointIds, focusedReasonSet])
 
   function toggleLayer(layerId) {
     setVisibleLayers((current) => ({
@@ -135,6 +165,8 @@ function RippleBoard({
     const stateLine =
       state === 'active'
         ? `Active signal: this route is directly linked to the selected chokepoint (${activeEffectPoint?.name ?? 'current point'}).`
+        : state === 'linked'
+          ? `Effect-linked signal: this route is part of the selected effect pathway (${activeImpactLensLabel.toLowerCase()}).`
         : state === 'inactive'
           ? 'Watchlist signal: this route is linked to a controllable chokepoint, but it is not the currently selected node.'
           : 'Ineligible signal: linked chokepoints are currently not disruptable by this war pair.'
@@ -146,6 +178,7 @@ function RippleBoard({
       state,
       countryId: selectedCountryId,
       effectPointId: selectedEffectPointId,
+      impactLensId: activeImpactLensId,
       lines: [item.primaryImpact, item.secondaryImpact, `${selectedCountryName}: ${stateLine}`],
     }
   }
@@ -156,7 +189,8 @@ function RippleBoard({
   }
   const displayedLayerInsight =
     selectedLayerInsight?.countryId === selectedCountryId &&
-    selectedLayerInsight?.effectPointId === selectedEffectPointId
+    selectedLayerInsight?.effectPointId === selectedEffectPointId &&
+    selectedLayerInsight?.impactLensId === activeImpactLensId
       ? selectedLayerInsight
       : null
 
@@ -198,7 +232,8 @@ function RippleBoard({
         </div>
         <p className="panel-copy">
           Red chokepoints are shown only when this war pair can plausibly disrupt
-          route control. Click a point to inspect direct impact pathways.
+          route control. Active effect pathway: {activeImpactLensLabel}. Linked
+          chokepoints glow with an outer ring.
         </p>
       </div>
 
@@ -362,35 +397,54 @@ function RippleBoard({
 
               const isHighlighted = highlightedChokepoints.has(point.id)
               const isSelected = point.id === selectedEffectPointId
+              const linkedReason = reasonByChokepointId[point.id] ?? null
+              const isReasonLinked = focusedReasonSet.has(point.id)
               const style = pointBandStyles[point.band] ?? pointBandStyles.Watch
+              const ringColor = theme === 'light' ? '#ba6d38' : '#ffbf7a'
               const radius = isSelected
-                ? 8.4
-                : Math.min(7.8, 4.6 + point.score / 30)
+                ? 8.8
+                : isReasonLinked
+                  ? Math.min(8.2, 5.2 + point.score / 28)
+                  : Math.min(7.8, 4.6 + point.score / 30)
 
               return (
-                <CircleMarker
-                  key={point.id}
-                  center={[point.coordinates.lat, point.coordinates.lng]}
-                  radius={radius}
-                  pathOptions={{
-                    color: style.color,
-                    fillColor: style.color,
-                    fillOpacity: 0.92,
-                    weight: isSelected ? 2.5 : isHighlighted ? 2 : 1.2,
-                  }}
-                  eventHandlers={{
-                    click: () => onSelectChokepoint(point.id),
-                  }}
-                >
-                  <Tooltip
-                    permanent={isSelected || point.rank <= 2}
-                    direction="right"
-                    offset={[6, 0]}
-                    className="world-map-tooltip"
+                <Fragment key={point.id}>
+                  {isReasonLinked ? (
+                    <Circle
+                      center={[point.coordinates.lat, point.coordinates.lng]}
+                      radius={200000 + (linkedReason?.contributionPct ?? 0) * 2200}
+                      pathOptions={{
+                        color: ringColor,
+                        opacity: isSelected ? 0.74 : 0.52,
+                        weight: isSelected ? 2.2 : 1.5,
+                        fillOpacity: 0,
+                      }}
+                    />
+                  ) : null}
+                  <CircleMarker
+                    center={[point.coordinates.lat, point.coordinates.lng]}
+                    radius={radius}
+                    pathOptions={{
+                      color: style.color,
+                      fillColor: style.color,
+                      fillOpacity: isReasonLinked ? 0.98 : 0.92,
+                      weight: isSelected ? 2.7 : isReasonLinked ? 2.25 : isHighlighted ? 2 : 1.2,
+                    }}
+                    eventHandlers={{
+                      click: () => onSelectChokepoint(point.id),
+                    }}
                   >
-                    {point.name} | {point.band}
-                  </Tooltip>
-                </CircleMarker>
+                    <Tooltip
+                      permanent={isSelected || isReasonLinked || point.rank <= 2}
+                      direction="right"
+                      offset={[6, 0]}
+                      className="world-map-tooltip"
+                    >
+                      {point.name} | {point.band}
+                      {linkedReason ? ` | ${linkedReason.contributionPct}%` : ''}
+                    </Tooltip>
+                  </CircleMarker>
+                </Fragment>
               )
             })}
 
@@ -404,19 +458,27 @@ function RippleBoard({
                     <CircleMarker
                       key={port.id}
                       center={port.coordinates}
-                      radius={state === 'active' ? 7.2 : state === 'inactive' ? 6.2 : 5.2}
+                      radius={
+                        state === 'active'
+                          ? 7.2
+                          : state === 'linked'
+                            ? 6.8
+                            : state === 'inactive'
+                              ? 6.2
+                              : 5.2
+                      }
                       pathOptions={{
                         color: style.color,
                         fillColor: style.color,
-                        fillOpacity: state === 'active' ? 0.9 : style.opacity,
-                        weight: state === 'active' ? 2.2 : 1.4,
+                        fillOpacity: state === 'active' ? 0.9 : state === 'linked' ? 0.78 : style.opacity,
+                        weight: state === 'active' ? 2.2 : state === 'linked' ? 1.9 : 1.4,
                       }}
                       eventHandlers={{
                         click: () => handleLayerClick(layerItem),
                       }}
                     >
                       <Tooltip
-                        permanent={state === 'active'}
+                        permanent={state === 'active' || state === 'linked'}
                         direction="left"
                         offset={[-4, 0]}
                         className="world-map-tooltip"
@@ -442,7 +504,7 @@ function RippleBoard({
                       pathOptions={{
                         color: style.color,
                         opacity: style.opacity,
-                        weight: state === 'active' ? 2.2 : 1.4,
+                        weight: state === 'active' ? 2.2 : state === 'linked' ? 1.9 : 1.4,
                         fillColor: style.color,
                         fillOpacity: style.fillOpacity,
                         dashArray: state === 'ineligible' ? '4 10' : '6 8',
@@ -452,7 +514,7 @@ function RippleBoard({
                       }}
                     >
                       <Tooltip
-                        permanent={state === 'active'}
+                        permanent={state === 'active' || state === 'linked'}
                         direction="center"
                         className="world-map-tooltip"
                       >
@@ -479,7 +541,13 @@ function RippleBoard({
             </div>
             <div className="stat-chip">
               <span className="stat-chip-label">Top spillover</span>
-              <strong className="stat-chip-value">{scenario.topAffected[0].name}</strong>
+              <strong className="stat-chip-value">
+                {scenario.topAffected[0]?.name ?? selectedCountryName}
+              </strong>
+            </div>
+            <div className="stat-chip">
+              <span className="stat-chip-label">Effect-linked points</span>
+              <strong className="stat-chip-value">{focusedReasons.length}</strong>
             </div>
           </div>
 
@@ -524,6 +592,10 @@ function RippleBoard({
               <span className="point-legend-dot point-legend-dot-watch" />
               <span>Watch-level effect</span>
             </article>
+            <article className="point-legend-item">
+              <span className="point-legend-dot point-legend-dot-reason" />
+              <span>Reason-linked point for selected effect</span>
+            </article>
           </div>
 
           <div className="map-impact-legend">
@@ -534,6 +606,10 @@ function RippleBoard({
             <article className="impact-legend-item">
               <span className="impact-legend-swatch impact-legend-swatch-secondary" />
               <span>Secondary signal: domestic downstream impact</span>
+            </article>
+            <article className="impact-legend-item">
+              <span className="impact-legend-swatch impact-legend-swatch-reason" />
+              <span>Selected-effect linkage pathway</span>
             </article>
           </div>
 
@@ -566,8 +642,18 @@ function RippleBoard({
               <h3 className="mt-2 text-2xl text-stone-100">
                 {activeEffectPoint.name}
               </h3>
+              <p className="mt-2 text-xs leading-5 text-slate-400">
+                Active effect: <strong>{activeImpactLensLabel}</strong> | linked
+                chokepoints: <strong>{focusedReasons.length}</strong>
+              </p>
+              {topFocusedReason ? (
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  Top reason for this effect: {topFocusedReason.chokepointName} (
+                  {topFocusedReason.contributionPct}% contribution)
+                </p>
+              ) : null}
               <p className="mt-2 text-sm leading-6 text-slate-300">
-                {selectedCountryName} oil-route dependence:{' '}
+                {selectedCountryName} route dependence here:{' '}
                 <strong>{activeEffectPoint.modelledImportShare}%</strong> | pressure{' '}
                 <strong>{activeEffectPoint.band}</strong> ({activeEffectPoint.score}
                 /100)
