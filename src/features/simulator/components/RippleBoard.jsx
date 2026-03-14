@@ -33,6 +33,11 @@ function RippleBoard({
   const selectedCountryName =
     scenario.countries.find((country) => country.id === selectedCountryId)?.name ??
     'Selected country'
+  const hasEffectPathway = focusedReasons.length > 0
+  const topSpilloverName = scenario.topAffected[0]?.name ?? selectedCountryName
+  const boardIntroCopy = hasEffectPathway
+    ? `Red chokepoints are shown only when this war pair can plausibly disrupt route control. Active effect pathway: ${activeImpactLensLabel}. Linked chokepoints glow with an outer ring.`
+    : `No ranked chokepoint pathway is active for ${activeImpactLensLabel.toLowerCase()} in the current setup. Increase escalation or change war pair to surface direct route-driven effects.`
   const selectedEffectPoint = effectPoints.find(
     (point) => point.id === selectedEffectPointId,
   )
@@ -230,11 +235,7 @@ function RippleBoard({
           <p className="eyebrow">Effects map</p>
           <h2 className="panel-title">Global spillover</h2>
         </div>
-        <p className="panel-copy">
-          Red chokepoints are shown only when this war pair can plausibly disrupt
-          route control. Active effect pathway: {activeImpactLensLabel}. Linked
-          chokepoints glow with an outer ring.
-        </p>
+        <p className="panel-copy">{boardIntroCopy}</p>
       </div>
 
       <div className="board-shell p-4 sm:p-5">
@@ -541,15 +542,20 @@ function RippleBoard({
             </div>
             <div className="stat-chip">
               <span className="stat-chip-label">Top spillover</span>
-              <strong className="stat-chip-value">
-                {scenario.topAffected[0]?.name ?? selectedCountryName}
-              </strong>
+              <strong className="stat-chip-value">{topSpilloverName}</strong>
             </div>
             <div className="stat-chip">
               <span className="stat-chip-label">Effect-linked points</span>
               <strong className="stat-chip-value">{focusedReasons.length}</strong>
             </div>
           </div>
+
+          {!hasEffectPathway ? (
+            <p className="map-fallback-line mt-3">
+              No reason-linked chokepoints are active for this selected effect. The
+              map remains in baseline watch mode.
+            </p>
+          ) : null}
 
           <div className="map-line-legend">
             {Object.entries(lineStyles).map(([lineId, lineStyle]) => (
@@ -650,6 +656,11 @@ function RippleBoard({
                 <p className="mt-1 text-xs leading-5 text-slate-500">
                   Top reason for this effect: {topFocusedReason.chokepointName} (
                   {topFocusedReason.contributionPct}% contribution)
+                </p>
+              ) : null}
+              {!hasEffectPathway ? (
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  No direct route reason is currently ranked for this effect.
                 </p>
               ) : null}
               <p className="mt-2 text-sm leading-6 text-slate-300">

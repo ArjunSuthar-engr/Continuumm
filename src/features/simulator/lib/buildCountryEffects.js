@@ -360,8 +360,26 @@ function buildLensDetail({
   effect,
   selectedPoint,
   noShockLine,
+  hasPrimaryShock,
   reasons,
 }) {
+  if (!hasPrimaryShock) {
+    return {
+      id,
+      label,
+      score: effect.score,
+      band: effect.band,
+      confidence: effect.confidence,
+      dataBasis: effect.dataBasis,
+      dataSource: effect.dataSource,
+      verdict: `${selectedCountryName}: no active route-control shock for ${label.toLowerCase()} in this setup.`,
+      why: [noShockLine],
+      reasonCount: 0,
+      reasons: [],
+      topReason: null,
+    }
+  }
+
   const topReason = reasons[0] ?? null
   const pointDriverLine = selectedPoint
     ? `${selectedPoint.name}: modeled route exposure ${selectedPoint.modelledImportShare}% for this country.`
@@ -683,6 +701,7 @@ export function buildCountryEffects({
         effect,
         selectedPoint,
         noShockLine,
+        hasPrimaryShock,
         reasons: reasonContributionsByLens[lens.id] ?? [],
       })
     })
@@ -702,7 +721,7 @@ export function buildCountryEffects({
     selectableLenses.map((lens) => [lens.id, lens]),
   )
 
-  if (highestLens) {
+  if (highestLens && hasPrimaryShock) {
     impactLenses.highest = {
       ...highestLens,
       id: 'highest',

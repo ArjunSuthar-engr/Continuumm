@@ -360,6 +360,62 @@ runTest('reason contract falls back cleanly when no chokepoint is disruptable', 
   assert.equal(countryEffects.impactLenses.highest.reasons.length, 0)
 })
 
+runTest('no-shock fallback keeps all lens reason lists empty and messaging explicit', () => {
+  const blockedChokepointIds = deriveConflictChokepoints({
+    aggressorId: 'india',
+    defenderId: 'germany',
+    conflictModeId: 'sanctions',
+    durationId: '2w',
+    intensity: 62,
+  })
+  const scenario = simulateConflict({
+    aggressorId: 'india',
+    defenderId: 'germany',
+    focusModeId: 'balanced',
+    conflictModeId: 'sanctions',
+    durationId: '2w',
+    intensity: 62,
+    blockedChokepointIds,
+  })
+  const effectPoints = buildEffectPoints({
+    aggressorId: 'india',
+    defenderId: 'germany',
+    conflictModeId: 'sanctions',
+    durationId: '2w',
+    intensity: 62,
+    selectedCountryId: 'japan',
+    blockedChokepointIds,
+  })
+  const countryEffects = buildCountryEffects({
+    scenario,
+    effectPoints,
+    selectedCountryId: 'japan',
+    selectedEffectPointId: null,
+  })
+
+  const lensIds = Object.keys(countryEffects.impactLenses)
+
+  assert.equal(effectPoints.length, 0)
+  assert.equal(
+    lensIds.every((lensId) => countryEffects.impactLenses[lensId].reasonCount === 0),
+    true,
+  )
+  assert.equal(
+    lensIds.every((lensId) => countryEffects.impactLenses[lensId].reasons.length === 0),
+    true,
+  )
+  assert.equal(
+    lensIds.every(
+      (lensId) => (countryEffects.reasonContributionsByLens[lensId] ?? []).length === 0,
+    ),
+    true,
+  )
+  assert.equal(
+    countryEffects.impactLenses.highest.verdict.includes('no active route-control shock'),
+    true,
+  )
+})
+
 runTest('india electricity effect remains lower than retail fuel effect under hormuz stress', () => {
   const blockedChokepointIds = deriveConflictChokepoints({
     aggressorId: 'israel',

@@ -1443,6 +1443,13 @@
     background: var(--theme-soft-surface);
   }
 
+  .map-fallback-line {
+    @apply rounded-[8px] border px-3 py-2 text-xs leading-5;
+    border-color: var(--theme-border);
+    color: var(--theme-text-muted);
+    background: var(--theme-contrast-surface);
+  }
+
   .map-line-legend {
     @apply mt-4 grid gap-2 border-b pb-4 md:grid-cols-2;
     border-color: var(--theme-border);

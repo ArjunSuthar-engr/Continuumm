@@ -64,6 +64,7 @@ function CountryImpactPanel({
     }
   })
   const activeReasons = activeLens?.reasons ?? []
+  const hasActiveReasons = activeReasons.length > 0
   const selectedReason =
     activeReasons.find((reason) => reason.chokepointId === activeEffectPoint?.id) ??
     activeReasons[0] ??
@@ -90,7 +91,9 @@ function CountryImpactPanel({
           <h2 className="panel-title">Impact on one country</h2>
         </div>
         <p className="panel-copy">
-          Pick one effect and immediately see the chokepoints that drive it.
+          {hasActiveReasons
+            ? 'Pick one effect and immediately see the chokepoints that drive it.'
+            : `No active chokepoint pathway is detected for ${selectedCountry?.name ?? 'this country'} in the current setup.`}
         </p>
       </div>
 
@@ -137,7 +140,9 @@ function CountryImpactPanel({
                   <span>
                     {option.reasonCount > 0
                       ? `${option.reasonCount} route reasons`
-                      : 'No active route reason'}
+                      : hasEffectPoints
+                        ? 'No direct route reason for this effect yet'
+                        : 'No controllable route in this war setup'}
                   </span>
                 </span>
                 <span className="impact-effect-option-score">
@@ -207,8 +212,8 @@ function CountryImpactPanel({
             </div>
           ) : (
             <p className="impact-driver-line mt-3">
-              No route-control reason is active for this effect in the current war
-              setup.
+              No ranked chokepoint reason is active for this effect right now. Try a
+              different war pair or raise severity to cross route-control thresholds.
             </p>
           )}
 
@@ -245,8 +250,9 @@ function CountryImpactPanel({
             </>
           ) : (
             <p className="mt-3 text-sm leading-6 text-slate-300">
-              Choose another war pair or increase severity to see routes where one
-              belligerent can realistically pressure transit.
+              No chokepoint is currently controllable by this war pair at the chosen
+              posture. Change pair, mode, or intensity to surface direct route
+              pressure.
             </p>
           )}
         </article>
