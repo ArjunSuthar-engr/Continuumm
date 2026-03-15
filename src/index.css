@@ -221,8 +221,9 @@
 
   body {
     margin: 0;
-    min-width: 320px;
+    min-width: 0;
     min-height: 100vh;
+    overflow-x: clip;
     color: var(--theme-text-base);
     background: var(--theme-body-bg);
     transition:
@@ -246,6 +247,7 @@
 
   #root {
     min-height: 100vh;
+    overflow-x: clip;
   }
 
   select {
@@ -276,6 +278,7 @@
     @apply sticky z-40 border-b;
     top: 0;
     width: 100%;
+    overflow-x: clip;
     border-color: var(--theme-border);
     background: var(--theme-header-bg);
     transition:
@@ -2776,24 +2779,42 @@
 }
 
 @media (max-width: 720px) {
+  .top-nav-inner {
+    gap: 0.45rem;
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+  }
+
+  .top-nav-right {
+    gap: 0.35rem;
+  }
+
+  .site-brand-mark {
+    width: 2.65rem;
+    height: 2.65rem;
+  }
+
   .brand-word {
-    font-size: 1.4rem;
+    font-size: 1.18rem;
+    letter-spacing: -0.02em;
   }
 
   .header-cta {
-    min-width: 112px;
+    min-width: 0;
     height: 2.5rem;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-    font-size: 0.9rem;
+    padding-left: 0.62rem;
+    padding-right: 0.62rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
   }
 
   .theme-toggle {
-    min-width: 84px;
+    min-width: 0;
     height: 2.5rem;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-    font-size: 0.9rem;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
   }
 
   .icon-button {
@@ -2897,6 +2918,12 @@
 
   .node-name {
     @apply text-[11px];
+  }
+}
+
+@media (max-width: 420px) {
+  .brand-word {
+    display: none;
   }
 }
 
