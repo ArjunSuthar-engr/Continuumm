@@ -31,6 +31,17 @@ const menuItems = [
   },
 ]
 
+const mobileDrawerItems = [
+  menuItems[0],
+  {
+    to: '/simulator',
+    label: 'Simulation',
+    code: '00',
+    note: 'Launch live conflict and spillover simulation',
+  },
+  ...menuItems.slice(1),
+]
+
 function SiteLayout() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [headerVisible, setHeaderVisible] = useState(true)
@@ -39,6 +50,7 @@ function SiteLayout() {
   const menuOpenRef = useRef(false)
   const menuRailRef = useRef(null)
   const menuButtonRef = useRef(null)
+  const navDrawerRef = useRef(null)
 
   useEffect(() => {
     menuOpenRef.current = menuOpen
@@ -83,7 +95,8 @@ function SiteLayout() {
 
       if (
         menuRailRef.current?.contains(target) ||
-        menuButtonRef.current?.contains(target)
+        menuButtonRef.current?.contains(target) ||
+        navDrawerRef.current?.contains(target)
       ) {
         return
       }
@@ -193,10 +206,14 @@ function SiteLayout() {
         </div>
 
         {menuOpen ? (
-          <nav className="nav-drawer nav-drawer-mobile" aria-label="Main navigation">
+          <nav
+            ref={navDrawerRef}
+            className="nav-drawer nav-drawer-mobile"
+            aria-label="Main navigation"
+          >
             <p className="nav-drawer-label">Command menu</p>
             <div className="nav-drawer-grid">
-              {menuItems.map((item) => (
+              {mobileDrawerItems.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
@@ -216,6 +233,23 @@ function SiteLayout() {
                   </span>
                 </NavLink>
               ))}
+              <button
+                type="button"
+                className="drawer-link drawer-utility"
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+              >
+                <span className="drawer-link-code">TH</span>
+                <span className="drawer-link-copy">
+                  <span className="drawer-link-title">Theme</span>
+                  <span className="drawer-link-note">
+                    Switch between dark and light mode
+                  </span>
+                </span>
+                <span className="drawer-utility-value">
+                  {theme === 'dark' ? 'Dark' : 'Light'}
+                </span>
+              </button>
             </div>
           </nav>
         ) : null}
