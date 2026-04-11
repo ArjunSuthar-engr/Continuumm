@@ -223,6 +223,7 @@
     margin: 0;
     min-width: 0;
     min-height: 100vh;
+    overflow-x: hidden;
     overflow-x: clip;
     color: var(--theme-text-base);
     background: var(--theme-body-bg);
@@ -247,6 +248,7 @@
 
   #root {
     min-height: 100vh;
+    overflow-x: hidden;
     overflow-x: clip;
   }
 
@@ -322,6 +324,7 @@
 
   .top-nav-right {
     @apply flex items-center gap-2.5;
+    min-width: 0;
   }
 
   .menu-rail-shell {
@@ -522,6 +525,16 @@
   }
 
   .drawer-link-active .drawer-link-arrow {
+    color: var(--theme-text-strong);
+  }
+
+  .drawer-utility {
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .drawer-utility-value {
+    @apply mono text-xs uppercase tracking-[0.16em];
     color: var(--theme-text-strong);
   }
 
@@ -2705,12 +2718,9 @@
     display: block;
   }
 
-  .header-cta {
-    min-width: 146px;
-  }
-
+  .header-cta,
   .theme-toggle {
-    min-width: 104px;
+    display: none;
   }
 
   .world-map-shell,
@@ -2780,46 +2790,33 @@
 
 @media (max-width: 720px) {
   .top-nav-inner {
-    gap: 0.45rem;
-    padding-left: 0.65rem;
-    padding-right: 0.65rem;
+    gap: 0.4rem;
+    padding-left: 0.4rem;
+    padding-right: 0.55rem;
+  }
+
+  .brand-cluster {
+    margin-left: -0.15rem;
+    gap: 0.42rem;
   }
 
   .top-nav-right {
-    gap: 0.35rem;
+    gap: 0.3rem;
   }
 
   .site-brand-mark {
-    width: 2.65rem;
-    height: 2.65rem;
+    width: 2.2rem;
+    height: 2.2rem;
   }
 
   .brand-word {
-    font-size: 1.18rem;
+    font-size: 1.01rem;
     letter-spacing: -0.02em;
   }
 
-  .header-cta {
-    min-width: 0;
-    height: 2.5rem;
-    padding-left: 0.62rem;
-    padding-right: 0.62rem;
-    font-size: 0.82rem;
-    white-space: nowrap;
-  }
-
-  .theme-toggle {
-    min-width: 0;
-    height: 2.5rem;
-    padding-left: 0.6rem;
-    padding-right: 0.6rem;
-    font-size: 0.82rem;
-    white-space: nowrap;
-  }
-
   .icon-button {
-    height: 2.5rem;
-    width: 2.5rem;
+    height: 2.35rem;
+    width: 2.35rem;
   }
 
   .nav-drawer-grid {
@@ -2921,7 +2918,7 @@
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 340px) {
   .brand-word {
     display: none;
   }
